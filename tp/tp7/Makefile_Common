@@ -1,4 +1,3 @@
-##################################################
 ########       AVR Project Makefile       ########
 #####                                        #####
 #####      Makefile produit et ecrit par     #####
@@ -14,6 +13,7 @@
 # Linux ou Unix, en utilisant l'outil AVR-GCC. 
 # Ce Makefile supporte C & C++
 
+
 #####      Details specifique a la cible       #####
 #####  Vous devez les adapter a votre projet   #####
 
@@ -21,11 +21,6 @@
 # (exemple: 'at90s8515')
 MCU=atmega324pa
 
-# Inclusions additionnels (ex: -I/path/to/mydir)
-INC= 
-
-# Libraires a lier (ex: -lmylib)
-LIBS= -l librairieRobot 
 
 # Niveau d'optimization
 # Utilisez s (size opt), 1, 2, 3 ou 0 (off)
@@ -34,6 +29,8 @@ OPTLEVEL=s
 # Programmer ID - Ne pas changer 
 # Liste complete des IDs disponible avec avrdude
 AVRDUDE_PROGRAMMERID=usbasp
+
+
 
 ####################################################
 #####         Configuration terminee           #####
@@ -59,7 +56,10 @@ REMOVE=rm -f
 # HEXFORMAT -- format pour les fichiers produient .hex
 HEXFORMAT=ihex
 
+
+
 ####### Options de compilation #######
+
 # Flags pour le compilateur en C
 CFLAGS=-I. -MMD $(INC) -g -mmcu=$(MCU) -O$(OPTLEVEL) \
 	-fpack-struct -fshort-enums             \
@@ -72,14 +72,6 @@ CXXFLAGS=-fno-exceptions
 # Linker pour lier les librairies utilisees
 LDFLAGS=-Wl,-Map,$(TRG).map -mmcu=$(MCU)
 
-
-####### Cible (Target) #######
-
-#Nom des cibles par defaut
-TRG=$(PROJECTNAME).out
-HEXROMTRG=$(PROJECTNAME).hex
-HEXTRG=$(HEXROMTRG) $(PROJECTNAME).ee.hex
-
 ####### Definition de tout les fichiers objets #######
 
 # Cette fonction permet de differencier les fichiers .c
@@ -90,13 +82,15 @@ CFILES=$(filter %.c, $(PRJSRC))
 CPPFILES=$(filter %.cpp, $(PRJSRC))
 
 # Liste de tout les fichiers objet que nous devons creer
-OBJDEPS=$(CFILES:.c=.o) 
+OBJDEPS=$(CFILES:.c=.o) \
 	$(CPPFILES:.cpp=.o)
 	
 # Pour plus d'information sur cette section, consulter :
 # http://bit.ly/257R53E	
 # Les fonctions $(filter pattern…,text) &
 # $(patsubst pattern,replacement,text) sont pertinentes
+	
+
 
 ####### Creation des commandes du Makefile ####### 
 
@@ -106,14 +100,6 @@ OBJDEPS=$(CFILES:.c=.o)
 # make all, make install et make clean
 .PHONY: all install clean 
 
-# Make all permet simplement de compiler le projet
-#
-all: $(TRG)
-
-# Implementation de la cible
-$(TRG): $(OBJDEPS)
-	$(CC) $(LDFLAGS) -o $(TRG) $(OBJDEPS) \
-	-lm $(LIBS)
 
 # Production des fichiers object
 # De C a objet
@@ -144,7 +130,7 @@ install: $(HEXROMTRG)
 # Make clean permet d'effacer tout les fichiers generes
 # lors de la compilation
 clean:
-	$(REMOVE) $(TRG) $(TRG).map $(OBJDEPS) $(HEXTRG) *.d
+	$(REMOVE) $(TRG) $(TRG).map $(OBJDEPS) $(HEXTRG) *.d lib_dir/*.o lib_dir/*.a lib_dir/*.d 
 
 # Pour plus d'information sur les phony target, consulter:
 # http://bit.ly/1WBQe61

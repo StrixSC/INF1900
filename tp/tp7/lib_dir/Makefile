@@ -1,12 +1,26 @@
-#include  ../Makefile_Common.txt
+
+
+####Make file de la librairie####
+####Pas encore complet. 
+####Necessite des changements afin pouvoir compiler la librairie et l'exec dans une commande avec make,
+####plutot que de toujours devoir changer de repertoire"
 
 # Nom de votre projet
-# (utilisez un seul mot, exemple: 'monprojet')
-PROJECTNAME= libraireRobot
+PROJECTNAME=libRobot
 
-# Fichiers sources
-# Utilisez le suffixe .cpp pour les fichiers C++
-# Listez tous les fichiers a compiler, separes par
-# un espace. exemple: 'tp1.c tp2.cpp':
-PRJSRC= $(wildcard .cpp)
+#Wildcard choisit de compiler tout les fichiers avec la terminaison specifiee.
+#Dans notre cas, avec la terminaison "cpp"
+PRJSRC= $(wildcard *.cpp)
 
+#Cible que nous voulons creer a partir des commandes make. .a signifie un fichier archive
+TRG=$(PROJECTNAME).a
+
+all : $(TRG)
+
+include ../Makefile_Common
+#Createur de archive:
+AR= avr-ar
+
+$(TRG): $(OBJDEPS)
+	$(AR) -crs $@ $^ 
+	
