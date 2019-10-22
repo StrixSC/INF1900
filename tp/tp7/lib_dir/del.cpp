@@ -1,5 +1,9 @@
 #include "del.h"
-
+/*
+@Brief: permet dallumer la del soit en rouge,vert ou ambre et la fermer
+@Param: port p 
+@Return: void (allume la del ou la ferme)
+*/
 Del::Del() {}
 
 void Del::allumerDEL(Port p){

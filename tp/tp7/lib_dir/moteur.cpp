@@ -1,5 +1,9 @@
 #include "moteur.h"
-
+/*
+@Brief: permet de controller le moteur, selon differentes vitesse 
+@Param: uin8_t left et uint8_t right
+@Return: void
+*/
 Moteur::Moteur(){
 }
 

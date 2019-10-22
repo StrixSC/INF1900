@@ -1,5 +1,6 @@
 #include "bouton.h"
 
+
 // void Bouton::click(Mode mode){
 //     switch (mode){
 //         case scrutation:
@@ -37,6 +38,7 @@
 //     EIFR |= (1 << INTF0);
 //     }
 // }
+
 
     Bouton::Bouton(){}
     Bouton::~Bouton(){}

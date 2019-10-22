@@ -1,5 +1,9 @@
 #include "timer.h"
-
+/*
+@Brief: genere une minuterie
+@Param: Mode mode, Timers timer, uint8_t duree,  Prescaler prescaler, OutputMode outputMode
+@Return: void
+*/
 Timer::Timer(){
     mode_ = Normal;
     timer_ = TCNT0_;
