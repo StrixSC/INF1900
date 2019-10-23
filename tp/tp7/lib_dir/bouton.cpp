@@ -1,5 +1,6 @@
 #include "bouton.h"
 
+<<<<<<< HEAD
 
 // void Bouton::click(Mode mode){
 //     switch (mode){
@@ -46,6 +47,8 @@
 @Param: rien
 @Return: rien
 */
+=======
+>>>>>>> 2de225322e7b7cc3d94638d4436c4a4e346338ef
     Bouton::Bouton(){}
 
 /*

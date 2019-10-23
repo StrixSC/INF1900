@@ -1,7 +1,14 @@
 #include "timer.h"
 /*
+<<<<<<< HEAD
 @Brief: constructeur, permet dinitialiser les val 
 @Param: rien
+=======
+@Brief: Constructeur par defaut de la classe Timer
+@Param: On initialise le mode_ a Normal, le timer_ a TCNT0 (le Timer 0 a 8bit)
+la duree que devra prendre 0CR0A a 0 et le prescaler a 1.
+On set le OutputMode a Highset, c-a-d que OC1A sera set to high on reach of top par OCR1A.
+>>>>>>> 2de225322e7b7cc3d94638d4436c4a4e346338ef
 @Return: void
 */
 Timer::Timer(){
@@ -13,11 +20,20 @@ Timer::Timer(){
 }
 
 /*
+<<<<<<< HEAD
 @Brief: constructeur par parametre 
 @Param: Mode mode, Timers timer, uint8_t duree,  Prescaler prescaler, OutputMode outputMode
 @Return: void
 */
 
+=======
+@Brief: Constructeur par param de la classe Timer
+Set la valeur des attributs a la valeur donnee par l'utilisateur.
+@Param: Un mode (enum), un Timer(enum), une duree (uint8_t), un prescaler (enum)
+et un OutputMOde (enum)
+@Return: void
+*/
+>>>>>>> 2de225322e7b7cc3d94638d4436c4a4e346338ef
 Timer::Timer(Mode mode, Timers timer, uint8_t duree,  Prescaler prescaler, OutputMode outputMode){
     mode_ = mode;
     timer_ = timer;
@@ -26,6 +42,7 @@ Timer::Timer(Mode mode, Timers timer, uint8_t duree,  Prescaler prescaler, Outpu
     outputMode_ = outputMode;
 }
 
+<<<<<<< HEAD
 /*
 @Brief: destructeur 
 @Param: rien
@@ -41,13 +58,27 @@ Timer::~Timer(){}
 */
 
 
+=======
+//Desturcteur
+Timer::~Timer(){}
+
+/*
+@Brief: Cette methode permet d'initier le timer avec les attributs
+@Param: void
+@Return: void
+*/
+
+>>>>>>> 2de225322e7b7cc3d94638d4436c4a4e346338ef
 void Timer::start(){
+    //On fait appel a chaque methode de modifications pour 
+    //s'assurer de set les attributs a ceux que nous avons specifier.
     setInitMode(mode_);
     setPrescaler(prescaler_);
     setDuree(duree_);
     setTimer(timer_);
     setOutputMode(outputMode_);
  
+    //Change les Registres par rapport au timer qui est utiliser. 
     if(timer_ == TCNT0_){
         TCNT0 = 0; 
         TIMSK0 |= (1 << OCIE0A);
@@ -61,42 +92,62 @@ void Timer::start(){
         TIMSK2 |= (1 << OCIE2A);
     }
     
+    //Enable la routine d'interruption
     sei();
 }
 
 /*
+<<<<<<< HEAD
 @Brief: permet d'arreter le timer 
 @Param: rien
 @Return: void
 */
 
+=======
+@Brief: Cette methode permet d'arreter le timer en marche en ce moment.
+@Param: void
+@Return: void
+*/
+>>>>>>> 2de225322e7b7cc3d94638d4436c4a4e346338ef
 void Timer::stop(){
 
-    TCNT0 = 0;
     if (timer_ == TCNT0_){
-        TCCR0B = 0;
-        TIMSK0 &= ~(1 << OCIE0A);
+        TCNT0 = 0;  //On set le timer a 0
+        TCCR0B = 0; //On set le prescaler a 0 (C-a-d que le timer ne roule plus)
+        TIMSK0 &= ~(1 << OCIE0A);   //On retire le mask.
     }
     else if(timer_ == TCNT1_){
+        TCNT1 = 0;
         TCCR1B = 0;
         TIMSK1 &= ~(1 << OCIE1A);
     }
     else if(timer_ == TCNT2_){
+        TCNT2 = 0;
         TCCR2B = 0;
         TIMSK2 &= ~(1 << OCIE2A);
     }
 
+    //On disable la routine d'interruption.
     cli();
 }
 
 /*
+<<<<<<< HEAD
 @Brief: permet de mettre en parametre la duree de la minuterie
 @Param: uint8_t duree
+=======
+@Brief: Cette methode set que doit avoir OCR1A pour trigger l'interruption
+@Param: une duree 8bit
+>>>>>>> 2de225322e7b7cc3d94638d4436c4a4e346338ef
 @Return: void
 */
 
 void Timer::setDuree(uint8_t duree){
+
+    //On set la duree a celle spceifie par l'utilisateur
     duree_ = duree;
+
+    //Dependamment du timer utiliser, on set les registres approprie
     if(timer_ == TCNT0_){
         OCR0A = duree;
     }
@@ -108,9 +159,16 @@ void Timer::setDuree(uint8_t duree){
     }
 }
 
+<<<<<<< HEAD
 /*
 @Brief: permet d'indiquer la valeur du timer
 @Param: Timers timer
+=======
+
+/*
+@Brief: Cette methode set le timer au timer qui est donne par l'utilisateur
+@Param: un Timer (enum)
+>>>>>>> 2de225322e7b7cc3d94638d4436c4a4e346338ef
 @Return: void
 */
 
@@ -118,15 +176,25 @@ void Timer::setTimer(Timers timer){
     timer_ = timer;
 }
 
+<<<<<<< HEAD
 /*
 @Brief: Permet d'indiquer le type de timer qu'on veut soit ctc, pmw-pc ou un timer normal. 
 @Param: Mode mode
+=======
+
+
+/*
+@Brief: Cette methode permet de set le registre TCCR0A au mode que l'on a beosin
+Les choix sont les suivants : Normal, CTC, F_PWM, PWM_PC
+@Param: un Mode (enum)
+>>>>>>> 2de225322e7b7cc3d94638d4436c4a4e346338ef
 @Return: void
 */
 
 void Timer::setInitMode(Mode mode){
     mode_ = mode;
 
+    //Dependamment du timer utiliser, on set les registres approprie
     switch (mode){
         case Normal:
             if (timer_ == TCNT0_){
@@ -179,11 +247,19 @@ void Timer::setInitMode(Mode mode){
 }
 
 /*
+<<<<<<< HEAD
 @Brief: 
 @Param: OutputMode m
 @Return: void
 */
 
+=======
+@Brief: Cette methode permet de set le OutputMode pour le timer.
+Les choix que nous avns: NormalOp, HighSet, Lowset ou Toggle.
+@Param: un Mode (enum)
+@Return: void
+*/
+>>>>>>> 2de225322e7b7cc3d94638d4436c4a4e346338ef
 void Timer::setOutputMode(OutputMode m){
 
     /*
@@ -323,12 +399,18 @@ void Timer::setPrescaler(Prescaler pres){
 
 }
 
+<<<<<<< HEAD
 /*
 @Brief: genere une minuterie
 @Param: Mode mode, Timers timer, uint8_t duree,  Prescaler prescaler, OutputMode outputMode
 @Return: void
 */
 
+=======
+//Cette methode est encore entrain de se faire tester
+//Pourrait se faire retirer et ne fait pas partie de l'api entier pour
+//l'instant.
+>>>>>>> 2de225322e7b7cc3d94638d4436c4a4e346338ef
 void Timer::PWM(uint8_t left, uint8_t right){
     if(mode_ == PWM_PC){
         if(timer_ == TCNT0){
