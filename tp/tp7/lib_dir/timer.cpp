@@ -1,7 +1,7 @@
 #include "timer.h"
 /*
-@Brief: genere une minuterie
-@Param: Mode mode, Timers timer, uint8_t duree,  Prescaler prescaler, OutputMode outputMode
+@Brief: constructeur, permet dinitialiser les val 
+@Param: rien
 @Return: void
 */
 Timer::Timer(){
@@ -12,6 +12,12 @@ Timer::Timer(){
     outputMode_ = HighSet;
 }
 
+/*
+@Brief: constructeur par parametre 
+@Param: Mode mode, Timers timer, uint8_t duree,  Prescaler prescaler, OutputMode outputMode
+@Return: void
+*/
+
 Timer::Timer(Mode mode, Timers timer, uint8_t duree,  Prescaler prescaler, OutputMode outputMode){
     mode_ = mode;
     timer_ = timer;
@@ -20,7 +26,20 @@ Timer::Timer(Mode mode, Timers timer, uint8_t duree,  Prescaler prescaler, Outpu
     outputMode_ = outputMode;
 }
 
+/*
+@Brief: destructeur 
+@Param: rien
+@Return: rien
+*/
+
 Timer::~Timer(){}
+
+/*
+@Brief: initialise le timer
+@Param: aucun
+@Return: void
+*/
+
 
 void Timer::start(){
     setInitMode(mode_);
@@ -45,6 +64,12 @@ void Timer::start(){
     sei();
 }
 
+/*
+@Brief: permet d'arreter le timer 
+@Param: rien
+@Return: void
+*/
+
 void Timer::stop(){
 
     TCNT0 = 0;
@@ -64,6 +89,12 @@ void Timer::stop(){
     cli();
 }
 
+/*
+@Brief: permet de mettre en parametre la duree de la minuterie
+@Param: uint8_t duree
+@Return: void
+*/
+
 void Timer::setDuree(uint8_t duree){
     duree_ = duree;
     if(timer_ == TCNT0_){
@@ -77,9 +108,21 @@ void Timer::setDuree(uint8_t duree){
     }
 }
 
+/*
+@Brief: permet d'indiquer la valeur du timer
+@Param: Timers timer
+@Return: void
+*/
+
 void Timer::setTimer(Timers timer){
     timer_ = timer;
 }
+
+/*
+@Brief: Permet d'indiquer le type de timer qu'on veut soit ctc, pmw-pc ou un timer normal. 
+@Param: Mode mode
+@Return: void
+*/
 
 void Timer::setInitMode(Mode mode){
     mode_ = mode;
@@ -134,6 +177,12 @@ void Timer::setInitMode(Mode mode){
         break;
     }
 }
+
+/*
+@Brief: 
+@Param: OutputMode m
+@Return: void
+*/
 
 void Timer::setOutputMode(OutputMode m){
 
@@ -201,6 +250,13 @@ void Timer::setOutputMode(OutputMode m){
         break;
     }
 }
+
+/*
+@Brief: genere une minuterie
+@Param: Mode mode, Timers timer, uint8_t duree,  Prescaler prescaler, OutputMode outputMode
+@Return: void
+*/
+
 void Timer::setPrescaler(Prescaler pres){
     prescaler_ = pres;
     switch(pres){
@@ -266,6 +322,12 @@ void Timer::setPrescaler(Prescaler pres){
     }
 
 }
+
+/*
+@Brief: genere une minuterie
+@Param: Mode mode, Timers timer, uint8_t duree,  Prescaler prescaler, OutputMode outputMode
+@Return: void
+*/
 
 void Timer::PWM(uint8_t left, uint8_t right){
     if(mode_ == PWM_PC){
