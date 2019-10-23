@@ -1,14 +1,28 @@
 #include "del.h"
+
 /*
-@Brief: permet dallumer la del soit en rouge,vert ou ambre et la fermer
-@Param: port p 
-@Return: void (allume la del ou la ferme)
+@Brief: Constructeur 
+@Param: aucun
+@Return: void 
 */
+
 Del::Del() {}
 
+/*
+rouge = ob01
+vert = ob10
+ferme = ob00
+*/
+
+
+/*
+@Brief: permet dallumer la del soit en rouge,vert 
+@Param: port p 
+@Return: void 
+*/
 void Del::allumerDEL(Port p){
     switch (p){
-        case A: PORTA = 0b01;
+        case A: PORTA = 0b01; 
         break;
 
         case B: PORTB = 0b01;
@@ -22,7 +36,11 @@ void Del::allumerDEL(Port p){
     }
 }
 
-
+/*
+@Brief: permet dallumer la del soit en couleur ambre
+@Param: port p 
+@Return: void 
+*/
 void Del::ambre(Port p){
 
     switch(p){
@@ -55,6 +73,12 @@ void Del::ambre(Port p){
         break;
     }
 }
+
+/*
+@Brief: permet d'eteindre la del 
+@Param: port p 
+@Return: void (
+*/
 
 void Del::eteindre(Port p){
     switch(p){
