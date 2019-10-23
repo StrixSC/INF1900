@@ -1,14 +1,9 @@
 #include "timer.h"
 /*
-<<<<<<< HEAD
-@Brief: constructeur, permet dinitialiser les val 
-@Param: rien
-=======
 @Brief: Constructeur par defaut de la classe Timer
 @Param: On initialise le mode_ a Normal, le timer_ a TCNT0 (le Timer 0 a 8bit)
 la duree que devra prendre 0CR0A a 0 et le prescaler a 1.
 On set le OutputMode a Highset, c-a-d que OC1A sera set to high on reach of top par OCR1A.
->>>>>>> 2de225322e7b7cc3d94638d4436c4a4e346338ef
 @Return: void
 */
 Timer::Timer(){
@@ -20,20 +15,12 @@ Timer::Timer(){
 }
 
 /*
-<<<<<<< HEAD
-@Brief: constructeur par parametre 
-@Param: Mode mode, Timers timer, uint8_t duree,  Prescaler prescaler, OutputMode outputMode
-@Return: void
-*/
-
-=======
 @Brief: Constructeur par param de la classe Timer
 Set la valeur des attributs a la valeur donnee par l'utilisateur.
 @Param: Un mode (enum), un Timer(enum), une duree (uint8_t), un prescaler (enum)
 et un OutputMOde (enum)
 @Return: void
 */
->>>>>>> 2de225322e7b7cc3d94638d4436c4a4e346338ef
 Timer::Timer(Mode mode, Timers timer, uint8_t duree,  Prescaler prescaler, OutputMode outputMode){
     mode_ = mode;
     timer_ = timer;
@@ -42,23 +29,6 @@ Timer::Timer(Mode mode, Timers timer, uint8_t duree,  Prescaler prescaler, Outpu
     outputMode_ = outputMode;
 }
 
-<<<<<<< HEAD
-/*
-@Brief: destructeur 
-@Param: rien
-@Return: rien
-*/
-
-Timer::~Timer(){}
-
-/*
-@Brief: initialise le timer
-@Param: aucun
-@Return: void
-*/
-
-
-=======
 //Desturcteur
 Timer::~Timer(){}
 
@@ -67,8 +37,6 @@ Timer::~Timer(){}
 @Param: void
 @Return: void
 */
-
->>>>>>> 2de225322e7b7cc3d94638d4436c4a4e346338ef
 void Timer::start(){
     //On fait appel a chaque methode de modifications pour 
     //s'assurer de set les attributs a ceux que nous avons specifier.
@@ -97,13 +65,6 @@ void Timer::start(){
 }
 
 /*
-<<<<<<< HEAD
-@Brief: permet d'arreter le timer 
-@Param: rien
-@Return: void
-*/
-
-=======
 @Brief: Cette methode permet d'arreter le timer en marche en ce moment.
 @Param: void
 @Return: void
@@ -132,10 +93,6 @@ void Timer::stop(){
 }
 
 /*
-<<<<<<< HEAD
-@Brief: permet de mettre en parametre la duree de la minuterie
-@Param: uint8_t duree
-=======
 @Brief: Cette methode set que doit avoir OCR1A pour trigger l'interruption
 @Param: une duree 8bit
 >>>>>>> 2de225322e7b7cc3d94638d4436c4a4e346338ef
@@ -159,11 +116,6 @@ void Timer::setDuree(uint8_t duree){
     }
 }
 
-<<<<<<< HEAD
-/*
-@Brief: permet d'indiquer la valeur du timer
-@Param: Timers timer
-=======
 
 /*
 @Brief: Cette methode set le timer au timer qui est donne par l'utilisateur
@@ -175,12 +127,6 @@ void Timer::setDuree(uint8_t duree){
 void Timer::setTimer(Timers timer){
     timer_ = timer;
 }
-
-<<<<<<< HEAD
-/*
-@Brief: Permet d'indiquer le type de timer qu'on veut soit ctc, pmw-pc ou un timer normal. 
-@Param: Mode mode
-=======
 
 
 /*
