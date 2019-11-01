@@ -39,14 +39,8 @@ volatile uint8_t minuterieExpiree = 0;
 
 
 int main(){
-    DDRD = 0xFF;
-    DDRB = 0xFF;
-    moteur.startEngine();
 
-    for(;;){
-        moteur.changeSpeed(50,50);
-    }
+    
 
     return 0;
-
 }
