@@ -44,5 +44,5 @@ int main(){
         _delay_ms(4); //dans la documentation à la page 26, on parle d'un delai de programmation de 3.3ms lorsqu'on veut ecrire dans la memoire, donc nous fixons le delai a 4ms pour etre sur que la donnee est bine ecrite
         position++;
     }
-    eteindre(port);
+    del.eteindre(port);
 }
