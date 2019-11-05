@@ -1,0 +1,6 @@
+ATT 8; 
+DAL 32;
+DET 32;
+ATT 8;
+DAL 32;
+DET 32; 
