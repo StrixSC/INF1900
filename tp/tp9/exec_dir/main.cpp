@@ -27,8 +27,6 @@ void prendreAction(uint8_t instruction, uint8_t operande, uint8_t adr);
 int main(){
 
  
-    
-
     // while(1){
     // mem.lecture(adr, &read);
     // uart.transmissionUART(read);
