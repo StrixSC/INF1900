@@ -14,6 +14,7 @@ int main(){
     DDRB=0XFF;
     Del del;
     Port port =B;
+    del.allumerDEL(port);
 
     //La mémoire reçoit le premier octet du uart
     premier_Octet = uart.receptionUART();
@@ -43,5 +44,5 @@ int main(){
         _delay_ms(4); //dans la documentation à la page 26, on parle d'un delai de programmation de 3.3ms lorsqu'on veut ecrire dans la memoire, donc nous fixons le delai a 4ms pour etre sur que la donnee est bine ecrite
         position++;
     }
-    del.allumerDEL(port);
+    eteindre(port);
 }
