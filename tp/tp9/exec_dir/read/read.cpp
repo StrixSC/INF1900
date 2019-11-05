@@ -44,9 +44,11 @@ int main(){
     //On lit le second byte
     uint8_t octet_2 = uart.receptionUART();
 
-    //On place le second byte dans le current
+    //On place le second byte dans le current, apres l'avoir bitshift de 8 position vers la gauche.
     current = (current << 8);
     current |= (octet_2);
+
+    uart.transmissionUART()
 
     
 
