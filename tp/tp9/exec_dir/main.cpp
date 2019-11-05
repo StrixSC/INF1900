@@ -4,6 +4,7 @@
 #include "../lib_dir/del.h"
 #include "../lib_dir/enums.h"
 #include "../lib_dir/moteur.h"
+#include "../lib_dir/debug.h"
 
 
 
@@ -16,7 +17,7 @@ Port port = B;
 Del del;
 Moteur moteur;
 uint8_t loopAdrStart = 0x00;
-uint8_t loopAdrStop = 0x00; 
+uint8_t loopAdrStop = 0x00;
 uint8_t loopCounter = 0x00;
 uint8_t debuterRoutine = 0;
 uint8_t read = 0;
@@ -25,6 +26,7 @@ void prendreAction(uint8_t instruction, uint8_t operande, uint8_t adr);
 
 int main(){
 
+<<<<<<< HEAD
  
     
 
@@ -35,38 +37,49 @@ int main(){
     // }
     
 
+=======
+    DDRA = 0x00;
+    DDRB = 0xFF;
+    DDRD = 0xFF;
+    DDRC = 0x00;
+>>>>>>> a1b988f26366c2209556dfc15440e011bc37ee8d
     uint8_t adr = 0x00;
     uint16_t tailleTotal = 0x0000;
-    uint8_t deuxPremiersOctets[] = {0x00, 0x00};
+    // uint8_t deuxPremiersOctets[] = {0x00, 0x00};
+    uint8_t octet1;
+    uint8_t octet2; 
 
     //Obtention de la taille totale:
-    deuxPremiersOctets[0] = mem.lecture(adr, &deuxPremiersOctets[0]);
-    tailleTotal = deuxPremiersOctets[0];
+    mem.lecture(adr, &octet1);
+    tailleTotal =  octet1;
     tailleTotal = (tailleTotal << 8);
     adr++;
 
-    deuxPremiersOctets[1] = mem.lecture(adr, &deuxPremiersOctets[1]);
-    tailleTotal |= deuxPremiersOctets[1];
+    mem.lecture(adr, &octet2);
+    tailleTotal |= octet2;
     adr++;
+        DEBUG_PRINT("Bonjour");
     
+
     //Nous avons maintenant la taille total du fichier
 
     while(adr < tailleTotal){
-        uint8_t instruction = mem.lecture(adr, &instruction);
+        mem.lecture(adr, &octet1);
+        adr++;
+        _delay_ms(4);//dans la documentation à la page 26, on parle d'un delai de programmation de 3.3ms lorsqu'on veut ecrire dans la memoire, donc nous fixons le delai a 4ms pour etre sur que la donnee est bine ecrite
+        DEBUG_PRINT("Bonjour");
+        mem.lecture(adr, &octet2);
         adr++;
         _delay_ms(4);//dans la documentation à la page 26, on parle d'un delai de programmation de 3.3ms lorsqu'on veut ecrire dans la memoire, donc nous fixons le delai a 4ms pour etre sur que la donnee est bine ecrite
 
-        uint8_t operande = mem.lecture(adr, &operande);
-        adr++;
-        _delay_ms(4);//dans la documentation à la page 26, on parle d'un delai de programmation de 3.3ms lorsqu'on veut ecrire dans la memoire, donc nous fixons le delai a 4ms pour etre sur que la donnee est bine ecrite
-
-        if(instruction == 0x01){
+        if(octet1 == 0x01){
             debuterRoutine = 1;
+            del.allumerDEL(port);
+
         }
         if(debuterRoutine){
-            prendreAction(instruction, operande, adr);
+            prendreAction(octet1, octet2, adr);
         }
-
     }
     return 0;
 }
@@ -139,10 +152,10 @@ void prendreAction(uint8_t instruction, uint8_t operande, uint8_t adr){
 
         case 0xFF:  //Terminer Programme
             debuterRoutine = 0;
-            moteur.changeSpeed(0,0);
-            loopAdrStart = 0;
-            loopAdrStop = 0;
-            loopCounter = 0;
+            // moteur.changeSpeed(0,0);
+            // loopAdrStart = 0;
+            // loopAdrStop = 0;
+            // loopCounter = 0;
         break;
     }
 }

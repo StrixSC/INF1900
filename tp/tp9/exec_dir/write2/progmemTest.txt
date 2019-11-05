@@ -1,0 +1,19 @@
+// commentaire 
+% commentaire
+# commentaire
+
+DBT ;
+
+DAL 1;  // ceci est aussi un commentaire
+DET 1;
+DAL 1;  // ceci est aussi un commentaire
+DET 1;
+DAL 1;  // ceci est aussi un commentaire
+DET 1;
+DAL 1;  // ceci est aussi un commentaire
+DET 1;
+DAL 1;  // ceci est aussi un commentaire
+DET 1;
+
+
+FIN;
