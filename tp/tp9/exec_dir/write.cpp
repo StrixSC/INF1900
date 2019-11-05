@@ -1,6 +1,6 @@
-#include "UART.h"
-#include "includes.h"
-#include "memoire_24.h"
+#include "../lib_dir/UART.h"
+#include "../lib_dir/includes.h"
+#include "../lib_dir/memoire_24.h"
 
 
 
