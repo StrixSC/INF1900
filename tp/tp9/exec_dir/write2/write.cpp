@@ -13,24 +13,26 @@ Del del;
 int main(){
 
     DDRB = 0xFF;
-    uint8_t deuxPremiersOctets[] = {0x00, 0x00};
+    // uint8_t deuxPremiersOctets[] = {0x00, 0x00};
+    uint8_t octet1;
+    uint8_t octet2;
     
-    uint16_t tailleTotal = 0x0000;
+    uint16_t tailleTotal;
     uint8_t adr = 0x00;
 
     //Methodologie: On cherche a obtenir la taille total afin d'obtenir de pouvoir obtenir les instructions du debut jusqua la fin.
 
-    deuxPremiersOctets[0] = uart.receptionUART();
-    tailleTotal = deuxPremiersOctets[0];
+    octet1 = uart.receptionUART();
+    tailleTotal = octet1;
     tailleTotal = (tailleTotal << 8);
 
-    mem.ecriture(adr, deuxPremiersOctets[0]);
+    mem.ecriture(adr, octet1);
     adr++;
 
-    deuxPremiersOctets[1] = uart.receptionUART();
-    tailleTotal |= deuxPremiersOctets[1];
+    octet2 = uart.receptionUART();
+    tailleTotal |= octet2;
 
-    mem.ecriture(adr, deuxPremiersOctets[1]);
+    mem.ecriture(adr, octet2);
     adr++;
 
     //On connait maintenant la taille totale du fichier, et nous avons l'avons aussi transmit au fichier binaire. 

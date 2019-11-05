@@ -12,7 +12,7 @@ Port port = B;
 Del del;
 Moteur moteur;
 uint8_t loopAdrStart = 0x00;
-uint8_t loopAdrStop = 0x00; 
+uint8_t loopAdrStop = 0x00;
 uint8_t loopCounter = 0x00;
 uint8_t debuterRoutine = 0;
 
@@ -21,21 +21,29 @@ void prendreAction(uint8_t instruction, uint8_t operande, uint8_t adr);
 
 int main(){
 
+    DDRB = 0xFF;
     uint8_t adr = 0x00;
     uint16_t tailleTotal = 0x0000;
-    uint8_t deuxPremiersOctets[] = {0x00, 0x00};
+    // uint8_t deuxPremiersOctets[] = {0x00, 0x00};
+    uint8_t octet1;
+    uint8_t octet2; 
 
     //Obtention de la taille totale:
-    deuxPremiersOctets[0] = mem.lecture(adr, &deuxPremiersOctets[0]);
-    tailleTotal = deuxPremiersOctets[0];
+    mem.lecture(adr, &octet1);
+    tailleTotal =  octet1;
     tailleTotal = (tailleTotal << 8);
     adr++;
 
-    deuxPremiersOctets[1] = mem.lecture(adr, &deuxPremiersOctets[1]);
-    tailleTotal |= deuxPremiersOctets[1];
+    mem.lecture(adr, &octet2);
+    tailleTotal |= octet2;
     adr++;
     
+
     //Nous avons maintenant la taille total du fichier
+
+    del.allumerDEL(port);
+    _delay_ms(1000);
+    del.eteindre(port);
 
     while(adr < tailleTotal){
         uint8_t instruction = mem.lecture(adr, &instruction);
@@ -52,7 +60,6 @@ int main(){
         if(debuterRoutine){
             prendreAction(instruction, operande, adr);
         }
-
     }
 
 }

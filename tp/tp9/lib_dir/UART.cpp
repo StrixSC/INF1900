@@ -24,7 +24,7 @@ void UART::transmissionUART(unsigned int data){
 
     /* Wait for empty transmit buffer */
     while (!(UCSR0A & (1<<UDRE0)))
-
+        ;
     /* Put data into buffer, sends the data */
     UDR0 = data;
 }
@@ -34,12 +34,10 @@ unsigned int UART::receptionUART(){
 
     unsigned char resh, resl;
     /* Wait for data to be received */
-    while (!(UCSR0A & (1<<RXC0))){
-        resh = UCSR0B;
-        resl = UDR0;
-    }
+    while (!(UCSR0A & (1<<RXC0)))
+        ;
     /* Filter the 9th bit, then return */
-    return ((resh << 8) | resl);
+    return UDR0;
 }
 
 
