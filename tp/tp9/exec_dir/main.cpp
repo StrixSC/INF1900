@@ -26,7 +26,6 @@ void prendreAction(uint8_t instruction, uint8_t operande, uint8_t adr);
 
 int main(){
 
-<<<<<<< HEAD
  
     
 
@@ -37,12 +36,10 @@ int main(){
     // }
     
 
-=======
     DDRA = 0x00;
     DDRB = 0xFF;
     DDRD = 0xFF;
     DDRC = 0x00;
->>>>>>> a1b988f26366c2209556dfc15440e011bc37ee8d
     uint8_t adr = 0x00;
     uint16_t tailleTotal = 0x0000;
     // uint8_t deuxPremiersOctets[] = {0x00, 0x00};
