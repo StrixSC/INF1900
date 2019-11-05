@@ -16,6 +16,7 @@ echo "
 ./progmem -v -o bytecode.bin write/progmemTest.txt
 make -C write
 make install -C write
+
 echo " 
   _____ ______   ____  ____   ______  ____  ____    ____      ____     ___   ____  ___   
  / ___/|      | /    ||    \ |      ||    ||    \  /    |    |    \   /  _] /    ||   \  
@@ -26,6 +27,6 @@ echo "
   \___|  |__|  |__|__||__|\_|  |__|  |____||__|__||___,_|    |__|\_||_____||__|__||_____|
                                                                                          
 "
-serieViaUSB -e -f .bin
+./serieViaUSB -e -f .bin
 make
 make install
