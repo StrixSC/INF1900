@@ -3,17 +3,17 @@
 # commentaire
 
 DBT ;
-ATT 8  ;
-DAL 81	;  // ceci est aussi un commentaire
-DET 255 ;
-SGO 90 ;
-SAR ;     # un commentaire tout aussi bon
-MAR;
 
-MAV  67;
-mre 9;
-TRD ;
-trg;
-DBC 34;   % la derniere forme de commentaire
-FBC;
+DAL 1;  // ceci est aussi un commentaire
+DET 1;
+DAL 1;  // ceci est aussi un commentaire
+DET 1;
+DAL 1;  // ceci est aussi un commentaire
+DET 1;
+DAL 1;  // ceci est aussi un commentaire
+DET 1;
+DAL 1;  // ceci est aussi un commentaire
+DET 1;
+
+
 FIN;

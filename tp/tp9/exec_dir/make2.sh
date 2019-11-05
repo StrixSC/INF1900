@@ -30,3 +30,4 @@ echo "
 ./serieViaUSB -e -f bytecode.bin
 make
 make install
+od -v -t x1 bytecode.bin

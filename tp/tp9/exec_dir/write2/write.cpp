@@ -12,7 +12,9 @@ Del del;
 
 int main(){
 
+    DDRA = 0x00;
     DDRB = 0xFF;
+    
     // uint8_t deuxPremiersOctets[] = {0x00, 0x00};
     uint8_t octet1;
     uint8_t octet2;
@@ -41,14 +43,14 @@ int main(){
     while(adr < tailleTotal){
         uint8_t instruction = 0x00;
         instruction = uart.receptionUART();
-        mem.ecriture(instruction, adr);
+        mem.ecriture(adr, instruction);
         adr++;
         _delay_ms(4);
 
-        uint8_t operande = 0x00;
-        operande = uart.receptionUART();
-        mem.ecriture(instruction, adr);
-        adr++; 
-        _delay_ms(4);
+        // uint8_t operande = 0x00;
+        // operande = uart.receptionUART();
+        // mem.ecriture(adr, operande);
+        // adr++; 
+        // _delay_ms(4);
     }
 }

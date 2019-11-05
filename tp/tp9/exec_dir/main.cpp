@@ -4,6 +4,7 @@
 #include "../lib_dir/del.h"
 #include "../lib_dir/enums.h"
 #include "../lib_dir/moteur.h"
+#include "../lib_dir/debug.h"
 
 //variables necessaires:
 Memoire24CXXX mem;
@@ -21,7 +22,10 @@ void prendreAction(uint8_t instruction, uint8_t operande, uint8_t adr);
 
 int main(){
 
+    DDRA = 0x00;
     DDRB = 0xFF;
+    DDRD = 0xFF;
+    DDRC = 0x00;
     uint8_t adr = 0x00;
     uint16_t tailleTotal = 0x0000;
     // uint8_t deuxPremiersOctets[] = {0x00, 0x00};
@@ -37,28 +41,27 @@ int main(){
     mem.lecture(adr, &octet2);
     tailleTotal |= octet2;
     adr++;
+        DEBUG_PRINT("Bonjour");
     
 
     //Nous avons maintenant la taille total du fichier
 
-    del.allumerDEL(port);
-    _delay_ms(1000);
-    del.eteindre(port);
-
     while(adr < tailleTotal){
-        uint8_t instruction = mem.lecture(adr, &instruction);
+        mem.lecture(adr, &octet1);
+        adr++;
+        _delay_ms(4);//dans la documentation à la page 26, on parle d'un delai de programmation de 3.3ms lorsqu'on veut ecrire dans la memoire, donc nous fixons le delai a 4ms pour etre sur que la donnee est bine ecrite
+        DEBUG_PRINT("Bonjour");
+        mem.lecture(adr, &octet2);
         adr++;
         _delay_ms(4);//dans la documentation à la page 26, on parle d'un delai de programmation de 3.3ms lorsqu'on veut ecrire dans la memoire, donc nous fixons le delai a 4ms pour etre sur que la donnee est bine ecrite
 
-        uint8_t operande = mem.lecture(adr, &operande);
-        adr++;
-        _delay_ms(4);//dans la documentation à la page 26, on parle d'un delai de programmation de 3.3ms lorsqu'on veut ecrire dans la memoire, donc nous fixons le delai a 4ms pour etre sur que la donnee est bine ecrite
-
-        if(instruction == 0x01){
+        if(octet1 == 0x01){
             debuterRoutine = 1;
+            del.allumerDEL(port);
+
         }
         if(debuterRoutine){
-            prendreAction(instruction, operande, adr);
+            prendreAction(octet1, octet2, adr);
         }
     }
 
@@ -132,10 +135,10 @@ void prendreAction(uint8_t instruction, uint8_t operande, uint8_t adr){
 
         case 0xFF:  //Terminer Programme
             debuterRoutine = 0;
-            moteur.changeSpeed(0,0);
-            loopAdrStart = 0;
-            loopAdrStop = 0;
-            loopCounter = 0;
+            // moteur.changeSpeed(0,0);
+            // loopAdrStart = 0;
+            // loopAdrStop = 0;
+            // loopCounter = 0;
         break;
     }
 }

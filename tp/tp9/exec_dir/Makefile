@@ -39,5 +39,5 @@ $(TRG): $(OBJDEPS)
 	-lm $(LIBS)
 
 clean:
-	$(REMOVE) $(TRG) $(TRG).map $(OBJDEPS) $(HEXTRG) *.d ../lib_dir/*.o ../lib_dir/*.a ../lib_dir/*.d 
+	$(REMOVE) $(TRG) $(TRG).map $(OBJDEPS) $(HEXTRG) *.d ../lib_dir/*.o ../lib_dir/*.a ../lib_dir/*.d write2/*.d write2/*.a write2/*.o write2/*.out write2/*.hex write/*.d write/*.a write/*.o write/*.out write/*.hex write/*.out.map write2/*.out.map
 
