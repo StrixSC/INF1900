@@ -24,12 +24,12 @@ int main(){
     //écrire le premier bit dans la mémoire
     memoire.ecriture(position, premier_Octet);
     _delay_ms(4); //dans la documentation à la page 26, on parle d'un delai de programmation de 3.3ms lorsqu'on veut ecrire dans la memoire, donc nous fixons le delai a 4ms pour etre sur que la donnee est bine ecrite
-    positionInitiale++; //la position de la mémoire augmente de 1, car la premiere case vient d etre utilisée
+    position++; //la position de la mémoire augmente de 1, car la premiere case vient d etre utilisée
     
     //écrire le premier bit dans la mémoire
-    memoire.ecriture(positionInitiale, deuxieme_bit);
+    memoire.ecriture(position, second_Octet);
     _delay_ms(4); //dans la documentation à la page 26, on parle d'un delai de programmation de 3.3ms lorsqu'on veut ecrire dans la memoire, donc nous fixons le delai a 4ms pour etre sur que la donnee est bine ecrite
-    positionInitiale++; //la position de la mémoire augmente de 1, car la premiere case vient d etre utilisée
+    position++; //la position de la mémoire augmente de 1, car la premiere case vient d etre utilisée
 
     //Taille des octets pour savoir le nombre de fois que la boucle while va s executer pour ecrire
     premier_Octet=premier_Octet<<4; //decalage de 4 bits permettra de faire un or avec le second octet et ainsi avoir une valeur sur 16 bits qui representera la taille des 2 octets
@@ -43,5 +43,5 @@ int main(){
         _delay_ms(4); //dans la documentation à la page 26, on parle d'un delai de programmation de 3.3ms lorsqu'on veut ecrire dans la memoire, donc nous fixons le delai a 4ms pour etre sur que la donnee est bine ecrite
         position++;
     }
-    del.allumerDel(port);
+    del.allumerDEL(port);
 }
