@@ -6,41 +6,34 @@ UART::UART(){
 }
 
 void UART::initialisationUART(){
-
-    // 2400 bauds. Nous vous donnons la valeur des deux
-    // premier registres pour vous éviter des complications
+    
     UBRR0H = 0;
     UBRR0L = 0xCF;
+    // permettre la réception et la transmission par le UART0
+    // UCSR0A = '';
+    // il nest pas necessaire d'ajuster ce registre 
+    //Enable Transmission and reception
+    UCSR0B |= (1<<RXEN0) | (1 << TXEN0);
+    // Format des trames: 8 bits (UCSZ01 et UCSZ00) (3<<UCSZn0) par defaut deja a 1 
+    //, 1 stop bits (USBSn = 0), none parity (UPMN) ;
+    UCSR0C |= (1<<UCSZ00) | (1<<UCSZ01);
 
-    UCSR0A = 0;
-    UCSR0B = _BV(RXEN0) | _BV(TXEN0);   //Enable transmission & reception
-    //Format des trames: 8 bits, 1 stop bits, none parity
-    UCSR0C = _BV(UCSZ01) | _BV(UCSZ00); // 8 Bits, 1 stop bit, with disabled parity.
-
-}
-
-//Fonction transmissionUART, prise de la documentation officielle ATMEL
-void UART::transmissionUART(unsigned int data){
-
-    /* Wait for empty transmit buffer */
-    while (!(UCSR0A & (1<<UDRE0)))
-
-    /* Put data into buffer, sends the data */
-    UDR0 = data;
-}
-
-//Fonction reception UART, prise de la documentation officielle ATMEL
-unsigned int UART::receptionUART(){
-
-    unsigned char resh, resl;
-    /* Wait for data to be received */
-    while (!(UCSR0A & (1<<RXC0))){
-        resh = UCSR0B;
-        resl = UDR0;
-    }
-    /* Filter the 9th bit, then return */
-    return ((resh << 8) | resl);
 }
 
 
 
+void UART::transmissionUART(uint8_t donnee)
+{
+    //Wait for empty transmit buffer
+    while(!(UCSR0A & (1<< UDRE0)))
+    ;
+    UDR0 = donnee;
+}
+
+unsigned char UART::receptionUART()
+{
+   //Attente de donnee
+   while (!(UCSR0A & (1<<RXC0)) );
+            
+   return UDR0;
+};
