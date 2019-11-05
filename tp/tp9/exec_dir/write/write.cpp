@@ -9,28 +9,30 @@ int main(){
     UART uart;
     Memoire24CXXX memoire;
     uint16_t positionInitiale=0x00;
-    uint16_t tailleOctet;
+    //uint16_t tailleOctet;
+    uint8_t premier_bit;
+    uint8_t deuxieme_bit;
 
     //La mémoire reçoit le premier bit du uart
-    tailleOctet = uart.receptionUART();
+    premier_bit = uart.receptionUART();
     
     //écrire le premier bit dans la mémoire
-    memoire.ecriture(positionInitiale, tailleOctet);
+    memoire.ecriture(positionInitiale, premier_bit);
     _delay_ms(4);//dans la documentation à la page 26, on parle d'un delai de programmation de 3.3ms lorsqu'on veut ecrire dans la memoire, donc nous fixons le delai a 4ms pour etre sur que la donnee est bine ecrite
 
     positionInitiale++;//la position de la mémoire augmente de 1, car la premiere case vient d etre utilisée
 
     //La mémoire reçoit le deuxieme bit du uart
-    tailleOctet = uart.receptionUART();
+    deuxieme_bit = uart.receptionUART();
     
     //écrire le premier bit dans la mémoire
-    memoire.ecriture(positionInitiale, tailleOctet);
+    memoire.ecriture(positionInitiale, deuxieme_bit);
     _delay_ms(4);//dans la documentation à la page 26, on parle d'un delai de programmation de 3.3ms lorsqu'on veut ecrire dans la memoire, donc nous fixons le delai a 4ms pour etre sur que la donnee est bine ecrite
 
     positionInitiale++;//la position de la mémoire augmente de 1, car la premiere case vient d etre utilisée
 
     //Taille des octets pour savoir le nombre de fois que la boucle while va s executer pour ecrire
-    tailleOctet=tailleOctet& (1<<transmission); //formule prise de la documentation du atmega à la page 27 du document
+    premier_bit=premier_bit& (1<<deuxieme_bit); //formule prise de la documentation du atmega à la page 27 du document
     
     //boucle pour recevoir et ecrire les donnees dans la memoire
     while(positionInitiale < tailleOctet){
