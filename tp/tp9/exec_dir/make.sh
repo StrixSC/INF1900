@@ -27,6 +27,6 @@ echo "
   \___|  |__|  |__|__||__|\_|  |__|  |____||__|__||___,_|    |__|\_||_____||__|__||_____|
                                                                                          
 "
-./serieViaUSB -e -f .bin
+./serieViaUSB -e -f bytecode.bin
 make
 make install
