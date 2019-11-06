@@ -81,11 +81,6 @@ int main(){
     uint8_t octet1; ///8 bit, car nous avons besoin d'un octet
     uint8_t octet2; 
 
-    for(uint8_t i = 45; i<81; i++){
-        piezo.play(i);
-        _delay_ms(100);
-    }
-    
     //Obtention de la taille totale:
     mem.lecture(adr, &octet1);
     tailleTotal =  octet1;
@@ -162,19 +157,19 @@ void prendreAction(uint8_t instruction, uint8_t operande){
         break;
 
         case MAV:  //Avancer
-            moteur.changeSpeed(operande,operande);
+            moteur.changeSpeed((operande/255.0*100),(operande/255.0*100));
         break;
 
         case MRE:  //Reculer
-            moteur.changeSpeed(-operande, -operande);
+            moteur.changeSpeed(-(operande/255.0*100),-(operande/255.0*100));
         break;
 
         case TRG:  //Tourner Gauche
-            moteur.changeSpeed(0,50);
+            moteur.changeSpeed(0,(operande/255.0*100));
         break;
 
         case TRD:  //Tourner Droite
-            moteur.changeSpeed(50,0);
+            moteur.changeSpeed((operande/255.0*100),0);
         break;
 
         case DBC:

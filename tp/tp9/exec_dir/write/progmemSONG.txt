@@ -1,0 +1,121 @@
+#song:
+dbt;
+
+sgo 74; #1
+att 2;
+sar 74;
+
+sgo 74; #1
+att 2;
+sar 74;
+
+sgo 76; #1
+att 2;
+sar 76;
+
+sgo 74; #1
+att 2;
+sar 74;
+
+sgo 71; #1
+att 2;
+sar 71;
+
+sgo 68; #1
+att 2;
+sar 68;
+
+sgo 71; #1
+att 2;
+sar 71;
+
+sgo 74; #1
+att 2;
+sar 74;
+
+sgo 76; #1
+att 2;
+sar 76;
+
+sgo 74; #2
+att 4;
+sar 74;
+
+sgo 68; #3
+att 6;
+sar 68;
+
+sgo 74; #3
+sgo 68; #3
+sgo 74; #3
+sgo 68; #1
+
+sgo 79; #1
+sgo 79; #1
+sgo 81; #1
+sgo 79; #1
+sgo 76; #1
+sgo 72; #1
+sgo 76; #1
+sgo 79; #1
+sgo 81; #1
+sgo 79; #1
+sgo 76; #3
+sgo 74; #2
+sgo 71; #2
+sgo 74; #2
+sgo 71; #1
+
+sgo 74; #1
+sgo 74; #1
+sgo 76; #1
+sgo 74; #1
+sgo 71; #1
+sgo 68; #1
+sgo 71; #1
+sgo 74; #1
+sgo 76; #1
+sgo 74; #2
+sgo 68; #3
+sgo 74; #3
+sgo 68; #3
+sgo 74; #3
+sgo 68; #1
+
+sgo 79; #1
+sgo 79; #1
+sgo 81; #1
+sgo 79; #1
+sgo 76; #1
+sgo 72; #1
+sgo 76; #1
+sgo 79; #1
+sgo 81; #1
+sgo 79; #1
+sgo 76; #3
+sgo 74; #2
+sgo 71; #2
+sgo 74; #2
+sgo 71; #1
+
+sgo 79; #3
+sgo 76; #2
+sgo 74; #2
+sgo 71; #2
+
+sgo 79; #2
+sgo 76; #2
+sgo 74; #2
+sgo 71; #2
+
+sgo 79; #2
+sgo 76; #2
+sgo 74; #2
+sgo 71; #2
+
+sgo 74; #2
+sgo 76; #5
+sgo 78; #2
+sgo 79; #6
+
+fin;
