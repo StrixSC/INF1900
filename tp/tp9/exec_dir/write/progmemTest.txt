@@ -1,11 +1,17 @@
-#SONG: 
+dbt;
+dal 64; // allumer del 7
+att 1000; //attendre 1s
+det; eteindre
+sgo 69; //jouer son
+att 10; // attendre 10ms
+sgo 54; // jouer son
+att 10; //attendre 10ms
+sgo 45;//jouer son
+att 15; //attendre 15ms
+sar;//arreter son
+mav 128;//avancer robot
+att 50;//attendre 50ms
+trd 128;//tourner a droite
+att 20;//attendre 20ms
+fin;
 
-62
-62
-64
-59
-66
-62
-64
-62
-59
