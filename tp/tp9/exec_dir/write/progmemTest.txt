@@ -1,16 +1,17 @@
-DBT;
-dal 64;
-att 10;
-sgo 69;
-att 10;
-sgo 54;
-att 10;
-sgo 45;
-att 15;
-sar;
-mav 128;
-att 50;
-trd 128;
-att 20;
-FIN;
+dbt;
+dal 64; // allumer del 7
+att 1000; //attendre 1s
+det; eteindre
+sgo 69; //jouer son
+att 10; // attendre 10ms
+sgo 54; // jouer son
+att 10; //attendre 10ms
+sgo 45;//jouer son
+att 15; //attendre 15ms
+sar;//arreter son
+mav 128;//avancer robot
+att 50;//attendre 50ms
+trd 128;//tourner a droite
+att 20;//attendre 20ms
+fin;
 
