@@ -81,6 +81,11 @@ int main(){
     uint8_t octet1; ///8 bit, car nous avons besoin d'un octet
     uint8_t octet2; 
 
+    for(uint8_t i = 45; i<81; i++){
+        piezo.play(i);
+        _delay_ms(100);
+    }
+    
     //Obtention de la taille totale:
     mem.lecture(adr, &octet1);
     tailleTotal =  octet1;
