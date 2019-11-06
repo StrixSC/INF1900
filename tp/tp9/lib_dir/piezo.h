@@ -12,6 +12,7 @@ class Piezo {
         //API//
         void play(uint8_t note);
         void stop();
+        void playSpongeBob();
 
         //BACKEND//
         void init();

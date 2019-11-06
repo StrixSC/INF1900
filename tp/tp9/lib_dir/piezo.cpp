@@ -35,3 +35,157 @@ void Piezo::play(uint8_t key){
     init();
     OCR0A = dutyCycle; 
 }
+
+void Piezo::playSpongeBob(){
+    uint8_t song = 1;
+    while (song){
+        /////////////////////
+        //Who-Lives-In-A-Pine-Ap-ple-Under-The-Sea
+        play(74);
+        _delay_ms(250);
+
+        play(74);
+        _delay_ms(250);
+
+        play(76);
+        _delay_ms(250);
+        
+        play(74);
+        _delay_ms(250);
+
+        play(71);
+        _delay_ms(250);
+
+        play(68);
+        _delay_ms(250);
+
+        play(71);
+        _delay_ms(250);
+
+        play(74);
+        _delay_ms(250);
+                
+        play(76);
+        _delay_ms(250);
+
+        play(74);
+        _delay_ms(300);
+        /////////////////////
+        //Sponge-Bob-Square-Pants
+        play(71);
+        _delay_ms(500);
+
+        play(74);
+        _delay_ms(500);
+
+        play(71);
+        _delay_ms(500);
+
+        play(74);
+        _delay_ms(500);
+
+        play(71);
+        _delay_ms(250);
+        ////////////////////
+        //Lyrics I dont know
+        play(79);
+        _delay_ms(250);
+
+         play(79);
+        _delay_ms(250);
+
+        play(81);
+        _delay_ms(250);
+        
+        play(79);
+        _delay_ms(250);
+
+        play(76);
+        _delay_ms(250);
+
+        play(72);
+        _delay_ms(250);
+
+        play(76);
+        _delay_ms(250);
+
+        play(79);
+        _delay_ms(250);
+                
+        play(81);
+        _delay_ms(250);
+
+        play(79);
+        _delay_ms(300);
+        /////////////////////
+        //Sponge-Bob-Square-Pants
+        play(76);
+        _delay_ms(500);
+
+        play(74);
+        _delay_ms(500);
+
+        play(71);
+        _delay_ms(500);
+
+        play(74);
+        _delay_ms(500);
+
+        play(71);
+        _delay_ms(300);
+        /////////////////////
+        //SPONGE-BOB-SQUARE-PANTS!
+        play(79);
+        _delay_ms(500);
+
+        play(76);
+        _delay_ms(500);
+
+        play(74);
+        _delay_ms(500);
+
+        play(71);
+        _delay_ms(500);
+        /////////////////////
+        play(79);
+        _delay_ms(500);
+
+        play(76);
+        _delay_ms(500);
+
+        play(74);
+        _delay_ms(500);
+
+        play(71);
+        _delay_ms(500);
+        /////////////////////
+        play(79);
+        _delay_ms(500);
+
+        play(76);
+        _delay_ms(500);
+
+        play(74);
+        _delay_ms(500);
+
+        play(71);
+        _delay_ms(500);
+
+        /////////////////////
+        //FINALE
+        play(74);
+        _delay_ms(500);
+
+        play(76);
+        _delay_ms(1250);
+
+        play(78);
+        _delay_ms(500);
+
+        play(79);
+        _delay_ms(1500);
+
+        stop();
+        song = 0;
+    }
+}

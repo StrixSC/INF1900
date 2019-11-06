@@ -77,16 +77,11 @@ int main(){
     DDRD = 0xFF;
     DDRC = 0x00;
 
+    piezo.playSpongeBob();
     uint16_t tailleTotal = 0x0000;
     uint8_t octet1; ///8 bit, car nous avons besoin d'un octet
     uint8_t octet2; 
-    uint8_t counterSong = 45; 
-
-    while (counterSong <= 81){
-        piezo.play(counterSong);
-        _delay_ms(50);
-        counterSong++;
-    }
+    uint8_t song = 1; 
 
     //Obtention de la taille totale:
     mem.lecture(adr, &octet1);

@@ -2,31 +2,22 @@
 dbt;
 dbc 50;//boucle 50 fois
 dal 64; // allumer del 7
-<<<<<<< HEAD
-att 10; //attendre 10ms
+att 1; //attendre 25ms
 det 64;//eteindre
 fbc;//fin boucle
 
 mav 200; //avancer robot
-att 120 //attendre 3s
+att 120; //attendre 3s
 MAR;//eteindre moteur
 sgo 69; //jouer son
 att 40; // attendre 10s
 sgo 54; // jouer son
 att 10; //attendre 10ms
 sar;//arreter son
-trd 128;//tourner a droite
+trd;//tourner a droite
 att 120;//attendre 3s
-trg 128;//tourner a gauche
+trg;//tourner a gauche
 att 120;//tourner a droite
-=======
-att 40; //attendre 1s
-det 64; //eteindre
-mav 200;//avancer robot
-att 50;//attendre 50ms
-att 20;//attendre 20ms
-MAR;
->>>>>>> 26bf671152c41fe396174169d4e0950a3f0e7ed3
 fin;
 
 
