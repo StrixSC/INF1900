@@ -5,10 +5,6 @@
 #include "../lib_dir/enums.h"
 #include "../lib_dir/moteur.h"
 
-
-
-
-
 //variables necessaires:
 Memoire24CXXX mem;
 UART uart;
@@ -24,14 +20,6 @@ uint16_t adr = 0;
 void prendreAction(uint8_t instruction, uint8_t operande, uint8_t adr);
 
 int main(){
-
- 
-    // while(1){
-    // mem.lecture(adr, &read);
-    // uart.transmissionUART(read);
-    // adr=+1;
-    // }
-    
 
     DDRA = 0x00;
     DDRB = 0xFF;
