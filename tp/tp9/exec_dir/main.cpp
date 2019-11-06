@@ -1,9 +1,13 @@
-#include "../lib_dir/UART.h"
+#include "UART.h"
 #include "../lib_dir/includes.h"
 #include "../lib_dir/memoire_24.h"
 #include "../lib_dir/del.h"
 #include "../lib_dir/enums.h"
 #include "../lib_dir/moteur.h"
+
+
+
+
 
 //variables necessaires:
 Memoire24CXXX mem;
@@ -15,11 +19,19 @@ uint8_t loopAdrStart = 0x00;
 uint8_t loopAdrStop = 0x00;
 uint8_t loopCounter = 0x00;
 uint8_t debuterRoutine = 0;
-
-
+uint8_t read = 0;
+uint16_t adr = 0;
 void prendreAction(uint8_t instruction, uint8_t operande, uint8_t adr);
 
 int main(){
+
+ 
+    // while(1){
+    // mem.lecture(adr, &read);
+    // uart.transmissionUART(read);
+    // adr=+1;
+    // }
+    
 
     DDRA = 0x00;
     DDRB = 0xFF;
@@ -58,7 +70,7 @@ int main(){
             prendreAction(octet1, octet2, adr);
         }
     }
-
+    return 0;
 }
 
 void prendreAction(uint8_t instruction, uint8_t operande, uint8_t adr){
