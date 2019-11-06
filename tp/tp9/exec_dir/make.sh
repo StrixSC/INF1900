@@ -14,6 +14,7 @@ echo "
                                                      
 "
 ./progmem -v -o bytecode.bin write/progmemTest.txt
+make clean -C write
 make -C write
 make install -C write
 
@@ -28,5 +29,7 @@ echo "
                                                                                          
 "
 ./serieViaUSB -e -f bytecode.bin
+make clean
 make
 make install
+od -v -t x1 bytecode.bin
