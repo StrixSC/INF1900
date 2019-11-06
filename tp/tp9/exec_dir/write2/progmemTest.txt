@@ -6,14 +6,19 @@ DBT ;
 
 DAL 1;  // ceci est aussi un commentaire
 DET 1;
+ATT 8;
 DAL 1;  // ceci est aussi un commentaire
 DET 1;
+ATT 8;
 DAL 1;  // ceci est aussi un commentaire
 DET 1;
+ATT 8;
 DAL 1;  // ceci est aussi un commentaire
 DET 1;
+ATT 8;
 DAL 1;  // ceci est aussi un commentaire
 DET 1;
+ATT 8;
 
 
 FIN;

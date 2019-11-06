@@ -20,7 +20,7 @@ void UART::initialisationUART(){
 }
 
 //Fonction transmissionUART, prise de la documentation officielle ATMEL
-void UART::transmissionUART(unsigned int data){
+void UART::transmissionUART(uint8_t data){
 
     /* Wait for empty transmit buffer */
     while (!(UCSR0A & (1<<UDRE0)));
@@ -29,15 +29,9 @@ void UART::transmissionUART(unsigned int data){
 }
 
 //Fonction reception UART, prise de la documentation officielle ATMEL
-unsigned int UART::receptionUART(){
-
-    unsigned char resh, resl;
-    /* Wait for data to be received */
-    while (!(UCSR0A & (1<<RXC0)))
-        ;
-    /* Filter the 9th bit, then return */
+uint8_t UART::receptionUART()
+{
+    while (!(UCSR0A & (1 << RXC0)));
     return UDR0;
 }
-
-
 

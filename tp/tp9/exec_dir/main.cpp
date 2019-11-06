@@ -4,7 +4,6 @@
 #include "../lib_dir/del.h"
 #include "../lib_dir/enums.h"
 #include "../lib_dir/moteur.h"
-#include "../lib_dir/debug.h"
 
 //variables necessaires:
 Memoire24CXXX mem;
@@ -41,8 +40,6 @@ int main(){
     mem.lecture(adr, &octet2);
     tailleTotal |= octet2;
     adr++;
-        DEBUG_PRINT("Bonjour");
-    
 
     //Nous avons maintenant la taille total du fichier
 
@@ -50,15 +47,12 @@ int main(){
         mem.lecture(adr, &octet1);
         adr++;
         _delay_ms(4);//dans la documentation à la page 26, on parle d'un delai de programmation de 3.3ms lorsqu'on veut ecrire dans la memoire, donc nous fixons le delai a 4ms pour etre sur que la donnee est bine ecrite
-        DEBUG_PRINT("Bonjour");
         mem.lecture(adr, &octet2);
         adr++;
         _delay_ms(4);//dans la documentation à la page 26, on parle d'un delai de programmation de 3.3ms lorsqu'on veut ecrire dans la memoire, donc nous fixons le delai a 4ms pour etre sur que la donnee est bine ecrite
 
         if(octet1 == 0x01){
             debuterRoutine = 1;
-            del.allumerDEL(port);
-
         }
         if(debuterRoutine){
             prendreAction(octet1, octet2, adr);

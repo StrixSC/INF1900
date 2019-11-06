@@ -15,6 +15,7 @@ int main(){
     DDRA = 0x00;
     DDRB = 0xFF;
     
+    PORTA = 0x00;
     // uint8_t deuxPremiersOctets[] = {0x00, 0x00};
     uint8_t octet1;
     uint8_t octet2;
