@@ -7,9 +7,10 @@ class Del {
 
 public:
     Del();
-    void allumerDEL(Port p);
-    void ambre(Port p);
-    void eteindre(Port p);
+    void vert();
+    void rouge();
+    void ambre();
+    void eteindre();
 };
 
 #endif

@@ -13,7 +13,7 @@ echo "
 |__|   |__|\_| \___/ |___,_||___|___||_____||___|___|
                                                      
 "
-./progmem -v -o output write/progmemTest.txt
+./progmem -v -o output.bin write/progmemTest.txt
 make clean -C write
 make -C write
 make install -C write
@@ -28,8 +28,8 @@ echo "
   \___|  |__|  |__|__||__|\_|  |__|  |____||__|__||___,_|    |__|\_||_____||__|__||_____|
                                                                                          
 "
-./serieViaUSB -e -f output
+./serieViaUSB -e -f output.bin
 make clean
 make
 make install
-od -v -t x1 bytecode.bin
+od -v -t x1 output.bin

@@ -9,31 +9,22 @@
 Del::Del() {}
 
 /*
-rouge = ob01
-vert = ob10
-ferme = ob00
-*/
-
-
-/*
-@Brief: permet dallumer la del soit en rouge,vert 
+@Brief: permet dallumer la del en vert
 @Param: port p 
 @Return: void 
 */
-void Del::allumerDEL(Port p){
-    switch (p){
-        case A: PORTA = 0b01; 
-        break;
+void Del::vert(){
+    PORTB = 0b01;
+}
 
-        case B: PORTB = 0b01;
-        break;
 
-        case C: PORTC = 0b01;
-        break;
-
-        case D: PORTD = 0b01;
-        break;
-    }
+/*
+@Brief: permet dallumer la del en rouge
+@Param: void
+@Return: void 
+*/
+void Del::rouge(){
+    PORTB = 0b10;
 }
 
 /*
@@ -41,37 +32,11 @@ void Del::allumerDEL(Port p){
 @Param: port p 
 @Return: void 
 */
-void Del::ambre(Port p){
-
-    switch(p){
-        case A: 
-            PORTA = 0b01;
-            _delay_ms(10);
-            PORTA = 0b10;
-            _delay_ms(10);
-        break;
-
-        case B:
-            PORTB = 0b01;
-            _delay_ms(10);
-            PORTB = 0b10;
-            _delay_ms(10);
-        break;
-
-        case C:
-            PORTB = 0b01;
-            _delay_ms(10);
-            PORTB = 0b10;
-            _delay_ms(10);
-        break;
-            
-        case D:
-            PORTB = 0b01;
-            _delay_ms(10);
-            PORTB = 0b10;
-            _delay_ms(10);
-        break;
-    }
+void Del::ambre(){
+    vert();
+    _delay_ms(10);
+    rouge();
+    _delay_ms(10);
 }
 
 /*
@@ -79,19 +44,6 @@ void Del::ambre(Port p){
 @Param: port p 
 @Return: void (
 */
-
-void Del::eteindre(Port p){
-    switch(p){
-        case A: PORTA = 0b00;
-        break;
-
-        case B: PORTB = 0b00;
-        break;
-
-        case C: PORTC = 0b00;
-        break;
-
-        case D: PORTD = 0b00;
-        break;
-    }
+void Del::eteindre(){
+    PORTB = 0b00;
 }

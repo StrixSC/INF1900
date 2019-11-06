@@ -1,5 +1,11 @@
-
 DBT;
+SGO 69;
+ATT 40;
+SAR; 
+ATT 40;
+SGO 40;
+ATT 40;
+SAR;
 DAL 1;
 ATT 40;
 DET 1;
@@ -7,4 +13,11 @@ ATT 40;
 DAL 1;
 ATT 40;
 DET 1;
+DBC 5;
+ATT 40;
+MAV 128;
+DAL 1; 
+ATT 40;
+DET 1; 
+FBC;
 FIN;
