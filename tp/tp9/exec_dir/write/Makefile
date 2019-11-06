@@ -1,7 +1,6 @@
 # Nom de votre projet
 # (utilisez un seul mot, exemple: 'monprojet')
 PROJECTNAME=write
-
 # Fichiers sources
 PRJSRC= write.cpp
 
@@ -40,5 +39,5 @@ $(TRG): $(OBJDEPS)
 	-lm $(LIBS)
 
 clean:
-	$(REMOVE) $(TRG) $(TRG).map $(OBJDEPS) $(HEXTRG) *.d ../lib_dir/*.o ../lib_dir/*.a ../lib_dir/*.d 
+	$(REMOVE) $(TRG) $(TRG).map $(OBJDEPS) $(HEXTRG) *.d ../../lib_dir/*.o ../../lib_dir/*.a ../lib_dir/*.d write/*.d write/*.a write/*.o write/*.out write/*.hex write/*.out.map write2/*.out.map
 

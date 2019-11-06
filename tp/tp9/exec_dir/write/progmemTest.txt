@@ -1,5 +1,4 @@
 DBT ;
-FIN;
 ATT 8  ;
 DAL 81	;  // ceci est aussi un commentaire
 DET 255 ;
@@ -13,3 +12,4 @@ TRD ;
 trg;
 DBC 34;   % la derniere forme de commentaire
 FBC;
+FIN;
