@@ -1,0 +1,16 @@
+DBT;
+dal 64;
+att 10;
+sgo 69;
+att 10;
+sgo 54;
+att 10;
+sgo 45;
+att 15;
+sar;
+mav 128;
+att 50;
+trd 128;
+att 20;
+FIN;
+
