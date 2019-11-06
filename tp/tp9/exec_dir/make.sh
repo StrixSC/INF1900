@@ -13,7 +13,8 @@ echo "
 |__|   |__|\_| \___/ |___,_||___|___||_____||___|___|
                                                      
 "
-./progmem -v -o output.bin write/progmemTest.txt
+# ./progmem -v -o output.bin write/progmemTest.txt
+./progmem -v -o output.bin write/progmemSONG.txt
 make clean -C write
 make -C write
 make install -C write
