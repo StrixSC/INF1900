@@ -14,7 +14,8 @@ Fichiers utilisés: Uart.h, includes.h, memoire_24.h, del.h, enums.h, moteur.h
 #include "../lib_dir/moteur.h"
 #include "../lib_dir/piezo.h"
 
-
+////////////////////////////////////////////////////////////////
+//Liste des instructions en OPCode
 #define DBT 0x01
 #define ATT 0x02
 #define DAL 0x44
@@ -31,22 +32,44 @@ Fichiers utilisés: Uart.h, includes.h, memoire_24.h, del.h, enums.h, moteur.h
 #define FBC 0xC1
 #define FIN 0xFF
 
-//variables necessaires:
+////////////////////////////////////////////////////////////////
+//Variables et initiation d'objets necessaire pour le programme
 Memoire24CXXX mem;
 UART uart;
 Del del;
 Moteur moteur;
 Piezo piezo;
 
-uint8_t loopAdrStart = 0x00;
-uint8_t loopAdrStop = 0x00;
-uint8_t loopCounter = 0x00;
-uint8_t debuterRoutine = 0;
-uint8_t read = 0;
+///////////////////////////////////////////////////////////////
+//Variables pour l'instruction de boucle
+uint8_t loopAdrStart = 0x00;        //Permet de garder en memoire l'adresse ou la boucle debute
+uint8_t loopCounter = 0x00;         //Permet de donner un counter du nombre de repetition pour la boucle
+
+///////////////////////////////////////////////////////////////
+//Variable boolean nous permettant de savoir si l'instruction DBT a ete lue
+uint8_t debuterRoutine = 0;         
+
+//Variable du current adresse. 
 uint16_t adr = 0x00;
+
+///////////////////////////////////////////////////////////////
+//Definition des fonctions prendreAction et seanceInit
 void prendreAction(uint8_t instruction, uint8_t operande);
 void seanceInit();
 
+///////////////////////////////////////////////////////
+///////////                                 ///////////
+///////////               MAIN              ///////////
+///////////                                 ///////////
+///////////////////////////////////////////////////////
+/*
+@Brief: Commence par lire le nombre d'octet du fichier.
+Ensuite init une boucle qui lira toute les instruction et leurs operandes
+Ce qui permet ensuite l'utilisation de prendreAction() des que l'instruction
+de debut est lue
+@param: void;
+@return: int;
+*/
 int main(){
     //nous définissons nos entrées et nos sorties
     DDRA = 0x00; //mode entrée
@@ -92,6 +115,13 @@ int main(){
     return 0;
 }
 
+/*
+@Brief: Cette fonction permet de prendre l'octet representant l'instruction 
+ainsi que l'operande, et, grace a une machine a etat, permet d'effectuer l'instruction
+a travers le robot.
+@Param: uint8_t et uint8_t (deux octets representant l'instruction et l'operande)
+@return: void.
+*/
 void prendreAction(uint8_t instruction, uint8_t operande){
 
     switch(instruction){
@@ -105,7 +135,7 @@ void prendreAction(uint8_t instruction, uint8_t operande){
         break;
 
         case DAL:
-            del.vert();
+            del.vert(); //On allume la DEl, peut importe la couleur
         break;
 
         case DET:
@@ -113,6 +143,7 @@ void prendreAction(uint8_t instruction, uint8_t operande){
         break;
 
         case SGO:
+            //L'operande represente la note qu'il faut jouer.
             piezo.play(operande);
         break;
 
@@ -155,14 +186,16 @@ void prendreAction(uint8_t instruction, uint8_t operande){
 
         case FIN:  //Terminer Programme
             debuterRoutine = 0;
-            // moteur.changeSpeed(0,0);
-            // loopAdrStart = 0;
-            // loopAdrStop = 0;
-            // loopCounter = 0;
         break;
     }
 }
 
+/*
+@Brief: Cette fonction ne sert qu'a faire clignoter la del en rouge 2 fois et 
+en vert deux fois, pour signifier le debut de la routine.
+@param: void;
+@return void;
+*/
 void seanceInit(){
    for(uint8_t i =0; i<2; i++){
        del.rouge();

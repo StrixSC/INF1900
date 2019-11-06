@@ -22,12 +22,7 @@ int main(){
 
     DDRA = 0x00;
     DDRB = 0xFF;
-<<<<<<< HEAD
-    
-    // uint8_t deuxPremiersOctets[] = {0x00, 0x00};
-=======
     PORTA = 0x00;
->>>>>>> a195c619aba08d57e77ea61ff8721b1cd9125a55
     uint8_t octet1;
     uint8_t octet2;
     uint16_t tailleTotal;
