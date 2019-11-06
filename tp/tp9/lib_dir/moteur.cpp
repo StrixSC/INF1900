@@ -48,7 +48,7 @@ void Moteur::startEngine(){
     TCNT1 = 0; //Set timer1 to 0   
     //On set le moteur a mode Phase Correct 8Bit et on set le outputMode a set to High when reach top.
     TCCR1A = _BV(COM1A1) | _BV(COM1A0) | _BV(COM1B1) | _BV(COM1B0) | _BV(WGM10);  
-    TCCR1B = _BV(WGM10); //1/8 Prescaler
+    TCCR1B = _BV(CS11); //1/8 Prescaler
     TCCR1C = 0; 
 }
 
@@ -60,10 +60,39 @@ Nous pouvons donc diminiuer la vitesse ou augmenter la vitesse des roues.
 la gauche et droite respectivement.
 @Return: void
 */
+
+//Roue gauche: D7->D5
+//Roue Droite: D8->D4
+//PINS: 0011 0000 = 0x30
+//PINS: 1100 1111 = 0xCF;
 void Moteur::changeSpeed(uint8_t left, uint8_t right){
+    stopEngine();
     startEngine();
     dutyCycleLeft_ = calculerPourcentage(left);
     dutyCycleRight_ = calculerPourcentage(right);
     OCR1A = dutyCycleLeft_;
     OCR1B = dutyCycleRight_;
+}
+
+/*
+@Brief: meme fonctionnement que changeSpeed, sauf qu'on inverse les pins utiliser
+pour "reculer"
+@Param: deux valeur de 8bit (uint_8t) pour le pourcentage de dutyCycle de 
+la gauche et droite respectivement.
+@Return: void
+*/
+void Moteur::backwards(uint8_t left, uint8_t right){
+    stopEngine();
+    startEngine();
+    dutyCycleLeft_ = calculerPourcentage(left);
+    dutyCycleRight_ = calculerPourcentage(right);
+    OCR1A = dutyCycleLeft_;
+    OCR1B = dutyCycleRight_;
+}
+void Moteur::stopEngine(){
+    TCCR1A = 0;
+    TCCR1B = 0;
+    TIMSK0 = 0;
+    OCR1A = 0;
+    OCR1B = 0;
 }

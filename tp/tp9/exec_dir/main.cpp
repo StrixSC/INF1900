@@ -77,7 +77,6 @@ int main(){
     DDRD = 0xFF;
     DDRC = 0x00;
 
-    piezo.playSpongeBob();
     uint16_t tailleTotal = 0x0000;
     uint8_t octet1; ///8 bit, car nous avons besoin d'un octet
     uint8_t octet2; 
@@ -110,6 +109,7 @@ int main(){
         if(octet1 == 0x01){ // permet de débuter la routine, seulement si on se trouve au début de l'adresse
             debuterRoutine = 1;
         }
+
         if(debuterRoutine){
             prendreAction(octet1, octet2);
         }
@@ -125,7 +125,7 @@ a travers le robot.
 @return: void.
 */
 void prendreAction(uint8_t instruction, uint8_t operande){
-
+    uint8_t puissance = (operande/255.0*100);
     switch(instruction){
         case DBT: //case begin
         break;
@@ -155,23 +155,23 @@ void prendreAction(uint8_t instruction, uint8_t operande){
 
         case MAR:
         case MAR2:  //Stop and start engine
-            moteur.changeSpeed(0,0);
+            moteur.stopEngine();
         break;
 
         case MAV:  //Avancer
-            moteur.changeSpeed((operande/255.0*100),(operande/255.0*100));
+            moteur.changeSpeed(puissance,puissance);
         break;
 
         case MRE:  //Reculer
-            moteur.changeSpeed(-(operande/255.0*100),-(operande/255.0*100));
+            moteur.backwards(puissance, puissance);
         break;
 
         case TRG:  //Tourner Gauche
-            moteur.changeSpeed(0,(operande/255.0*100));
+            moteur.changeSpeed(0,50);
         break;
 
         case TRD:  //Tourner Droite
-            moteur.changeSpeed((operande/255.0*100),0);
+            moteur.changeSpeed(50,0);
         break;
 
         case DBC:
@@ -187,10 +187,15 @@ void prendreAction(uint8_t instruction, uint8_t operande){
         break;
 
         case FIN:  //Terminer Programme
+            piezo.playSpongeBob();
+            piezo.stop();
+            moteur.stopEngine();
             debuterRoutine = 0;
         break;
     }
 }
+    
+
 
 /*
 @Brief: Cette fonction ne sert qu'a faire clignoter la del en rouge 2 fois et 
