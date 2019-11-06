@@ -80,6 +80,13 @@ int main(){
     uint16_t tailleTotal = 0x0000;
     uint8_t octet1; ///8 bit, car nous avons besoin d'un octet
     uint8_t octet2; 
+    uint8_t counterSong = 45; 
+
+    while (counterSong <= 81){
+        piezo.play(counterSong);
+        _delay_ms(50);
+        counterSong++;
+    }
 
     //Obtention de la taille totale:
     mem.lecture(adr, &octet1);
