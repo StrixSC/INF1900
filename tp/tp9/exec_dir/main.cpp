@@ -1,3 +1,11 @@
+/**************************************************************************************************************************
+Auteurs: Nawras Mohammed Amin, John Maliha, Johnny Khoury, Fadi Nourredine
+Description: Ce fichier permet de faire passer au robot différents états pour lui faire faire ce que nous désirons en fonction de ce qu'il lui est passé en paramètres
+            grâce aux états du switch case.
+Fichiers utilisés: Uart.h, includes.h, memoire_24.h, del.h, enums.h, moteur.h
+
+**************************************************************************************************************************/
+
 #include "UART.h"
 #include "../lib_dir/includes.h"
 #include "../lib_dir/memoire_24.h"
@@ -40,23 +48,25 @@ void prendreAction(uint8_t instruction, uint8_t operande);
 void seanceInit();
 
 int main(){
-    DDRA = 0x00; 
-    DDRB = 0xFF;
+    //nous définissons nos entrées et nos sorties
+    DDRA = 0x00; //mode entrée
+    DDRB = 0xFF; //mode sortie
     DDRD = 0xFF;
     DDRC = 0x00;
 
     uint16_t tailleTotal = 0x0000;
-    uint8_t octet1;
+    uint8_t octet1; ///8 bit, car nous avons besoin d'un octet
     uint8_t octet2; 
 
     //Obtention de la taille totale:
     mem.lecture(adr, &octet1);
     tailleTotal =  octet1;
-    tailleTotal = (tailleTotal << 8);
-    adr++;
+    tailleTotal = (tailleTotal << 8); // décalage de 8 bits vers la gauche pour après faire un or avec le second octet qui nous permettra d'avoir une valeur sur 16bits
+    adr++; // on passe à l'adresse suivante
 
+    //on fait appelle au à la fonction lecture de la memoire_24.h qui permet de lire une adresse et le stocker dans une variable
     mem.lecture(adr, &octet2);
-    tailleTotal |= octet2;
+    tailleTotal |= octet2;//permet de faire le ou logique pour obtenir la taille du fichier qui est donné par les 2 premiers octets
     adr++;
 
     //Nous avons maintenant la taille total du fichier
@@ -72,7 +82,7 @@ int main(){
         adr++;
         _delay_ms(4);//dans la documentation à la page 26, on parle d'un delai de programmation de 3.3ms lorsqu'on veut ecrire dans la memoire, donc nous fixons le delai a 4ms pour etre sur que la donnee est bine ecrite
 
-        if(octet1 == 0x01){
+        if(octet1 == 0x01){ // permet de débuter la routine, seulement si on se trouve au début de l'adresse
             debuterRoutine = 1;
         }
         if(debuterRoutine){
