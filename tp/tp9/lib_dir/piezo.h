@@ -15,7 +15,6 @@ class Piezo {
 
         //BACKEND//
         void init();
-        uint8_t calculTemps(uint16_t freq);
 
     private:
         //La liste des frequences a utiliser pour le piezo. Fournit par le professeur.

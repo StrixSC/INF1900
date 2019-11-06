@@ -6,11 +6,11 @@ Fichiers utilisés: Uart.h, includes.h, memoire_24.h, del.h, enums.h
 **************************************************************************************************************************/
 
 
-#include "../lib_dir/UART.h"
-#include "../lib_dir/includes.h"
-#include "../lib_dir/memoire_24.h"
-#include "../lib_dir/del.h"
-#include "../lib_dir/enums.h"
+#include "../../lib_dir/UART.h"
+#include "../../lib_dir/includes.h"
+#include "../../lib_dir/memoire_24.h"
+#include "../../lib_dir/del.h"
+#include "../../lib_dir/enums.h"
 
 //nous créons des variables de type de chacune des classes que nous allons utliser
 Memoire24CXXX mem;

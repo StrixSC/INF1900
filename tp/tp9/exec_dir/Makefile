@@ -1,8 +1,8 @@
 # Nom de votre projet
 # (utilisez un seul mot, exemple: 'monprojet')
-PROJECTNAME=main
+PROJECTNAME=PiezoTest
 # Fichiers sources
-PRJSRC= main.cpp
+PRJSRC= PiezoTest.cpp
 
 ##### A VERIFIER #####
 # LIBRAIRIE= $(libRobot).a
