@@ -1,0 +1,7 @@
+#!/bin/bash
+#Simplement ecrire ./make.sh dans le exec_dir  et le programme executera toute les commandes necessaire pour compiler la librairie et les executables.
+
+
+make clean
+make
+make install

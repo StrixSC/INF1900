@@ -1,0 +1,10 @@
+Liste de todos pour le PROJET:
+    ✔ Calibrer les capteurs @started(19-11-08 12:40) @done(19-11-12 00:53) @lasted(3d12h13m9s)
+    ✘ relier les capteurs a l'interface (faire classe de Capteurs) @cancelled(19-11-12 00:53)
+    ✔ faire fonction Detecter pour savoir le stade des capteurs @done(19-11-12 00:53)
+
+    ✔ TODO: Follow-line @started(19-11-12 00:57) @done(19-11-12 01:26) @lasted(29m2s)
+    ✔ TODO: Dont-follow-line XD => Corridor @done(19-11-12 01:26)
+    ✔ TODO: initRightTurn() -> dans la classe moteur svp :) @done(19-11-12 01:25)
+    ✔ TODO: initLeftTurn() -> dans la classe moteur svp :) @done(19-11-12 01:25)
+    ✔ TODO: moteur.reverse (go backwards) @started(19-11-12 01:25) @done(19-11-12 01:25) @lasted(56s)
