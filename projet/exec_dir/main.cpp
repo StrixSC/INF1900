@@ -134,6 +134,12 @@ void followLine(){
     else if(C5==true){
         moteur.changeSpeed(50,0);
     }
+    else if(C4 && C5 ==true){
+        moteur.turnRight(80);
+    }
+    else if(C1 && C2 ==true){
+        moteur.turnLeft(80);
+    }
     else{
         moteur.changeSpeed(0,0);
     }
