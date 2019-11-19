@@ -14,13 +14,17 @@ Fichiers utilisés: Uart.h, includes.h, memoire_24.h, del.h, enums.h, moteur.h
 #include "moteur.h"
 #include "piezo.h"
 #include "can.h"
-// #include "LightSensor.h"
 
 #define CAPTEUR1 0b00000001
 #define CAPTEUR2 0b00000010
 #define CAPTEUR3 0b00000100
 #define CAPTEUR4 0b00001000
 #define CAPTEUR5 0b00010000
+#define ONE_SECOND 1000
+#define HALF_SECOND 500
+#define AVGSPEED 42
+#define HIGHSPEED 50
+#define LOWSPEED 40
 
 ////////////////////////////////////////////////////////////////
 //Variables et initiation d'objets necessaire pour le programme
@@ -28,7 +32,9 @@ Fichiers utilisés: Uart.h, includes.h, memoire_24.h, del.h, enums.h, moteur.h
 // UART uart;
 Del del;
 Moteur moteur;
-// Piezo piezo;
+Piezo piezo;
+enum CurrentSection {FollowLine, Couloir, Mur, Coupures, Boucles};
+CurrentSection current = FollowLine;
 ///////////////////////////////////////////////////////////////
 //Variable boolean pour le stade de nos capteurs
 bool C1 = false;
@@ -37,17 +43,17 @@ bool C3 = false;
 bool C4 = false;
 bool C5 = false;
 ///////////////////////////////////////////////////////////////
-//Definition des fonctions
-void seanceInit();
+//Definition des fonctions utilisees dans se fichier
 void detect();
 void followLine();
+void dontFollowLine();
 ///////////////////////////////////////////////////////
 ///////////                                 ///////////
 ///////////               MAIN              ///////////
 ///////////                                 ///////////
 ///////////////////////////////////////////////////////
 /*
-@Brief: 
+@Brief: Fonction main
 @param: void;
 @return: int;
 */
@@ -56,35 +62,34 @@ int main(){
     DDRB = 0xFF; //mode sortie
     DDRD = 0xFF;
     moteur.startEngine();
-
     while(true){
         detect();
         followLine();
+        // switch(current){
+        //     case FollowLine:
+        //         detect();
+        //         followLine();   
+        //     break;
+
+        //     case Couloir:
+        //         detect();
+        //         dontFollowLine();
+        //     break;
+
+        //     case Mur:  
+        //         // TODO
+        //     break;
+
+        //     case Coupures:
+        //         // TODO
+        //     break;
+
+        //     case Boucles:
+        //         // TODO
+        //     break;
     }
 }
 
-/*
-@Brief: Cette fonction ne sert qu'a faire clignoter la del en rouge 2 fois et 
-en vert deux fois, pour signifier le debut de la routine.
-@param: void;
-@return void;
-*/
-void seanceInit(){
-   for(uint8_t i =0; i<2; i++){
-       del.rouge();
-       _delay_ms(500);
-       del.eteindre();
-       _delay_ms(500);
-   }
-
-   for(uint8_t i =0; i<2; i++){
-       del.vert();
-       _delay_ms(500);
-       del.eteindre();
-       _delay_ms(500);
-   }
-
-}
 
 /*
 @Brief: Modifie le stade des variables de capteurs dependamment du signal que le 
@@ -119,17 +124,33 @@ void detect(){
 }
 
 void followLine(){
-    if(C3){                              //0 0 1 0 0 
-        moteur.changeSpeed(50,50);
-    }      
-    else if(C2 && C3)                   //0 1 1 0 0 
-        moteur.changeSpeed(40,60); 
-    else if(C3 && C4)                   //0 0 0 1 1
-        moteur.changeSpeed(60,40);      
-    else if(C3 && C4 && C5)             //0 0 1 1 1 -> rightTurn
-        moteur.turnRight(50);
-    else if(C1 && C2 && C3)             //1 1 1 0 0 -> leftTurn
-        moteur.turnLeft(50);
-    else
+
+}
+
+void dontFollowLine(){
+    if(C1 && !C2 && !C3 && !C4 && C5){              //1 0 0 0 1
+        moteur.changeSpeed(AVGSPEED,AVGSPEED);
+    }
+    else if(C1 && !C2 && !C3 && !C4 && !C5) {              //1 0 0 0 0
+        moteur.changeSpeed(HIGHSPEED,AVGSPEED);                  
+    }
+    else if(!C1 && !C2 && !C3 && !C4 && C5) {              //0 0 0 0 1
+        moteur.changeSpeed(AVGSPEED,HIGHSPEED);                  
+    }
+    else if((!C1 && C2 && !C3 && !C4 && !C5) 
+    || (C1 && C2 && !C3 && !C4 && !C5)){                   //0 1 0 0 0 or 1 1 0 0 0
+        moteur.changeSpeed(HIGHSPEED,AVGSPEED);                  
+    }
+    else if((!C2 && !C3 && C4) 
+    || (!C2 && !C3 && C4 && C5)){                   //0 0 0 1 0 or 0 0 0 1 1
+        moteur.changeSpeed(AVGSPEED,HIGHSPEED);                  
+    }
+
+    else if (C1 && !C2 && C3 && !C4 && C5){
         moteur.stopEngine();
+        piezo.beep();
+        piezo.stop();
+        _delay_ms(ONE_SECOND);
+        current = FollowLine;              //Switch le currentStage a Couloir.
+    }
 }
