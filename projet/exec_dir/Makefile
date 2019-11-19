@@ -1,8 +1,8 @@
 # Nom de votre projet
 # (utilisez un seul mot, exemple: 'monprojet')
-PROJECTNAME=main
+PROJECTNAME=sonartest
 # Fichiers sources
-PRJSRC= main.cpp
+PRJSRC= SonarTest.cpp
 
 ##### A VERIFIER #####
 # LIBRAIRIE= $(libRobot).a
