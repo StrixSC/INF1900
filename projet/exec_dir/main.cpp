@@ -66,7 +66,7 @@ int main(){
         detect();
         followLine();
         switch(current){
-            
+
             case FollowLine:
                 detect();
                 followLine();   
@@ -125,7 +125,24 @@ void detect(){
 }
 
 void followLine(){
-
+    if(C1==true){
+        moteur.changeSpeed(0,50);
+    }
+    else if(C2==true){
+        moteur.changeSpeed(0,40);
+    }
+    else if(C3==true){
+        moteur.changeSpeed(50,50);
+    }
+    else if(C4==true){
+        moteur.changeSpeed(40,0);
+    }
+    else if(C5==true){
+        moteur.changeSpeed(50,0);
+    }
+    else{
+        moteur.changeSpeed(0,0);
+    }
 }
 
 void dontFollowLine(){
@@ -153,5 +170,4 @@ void dontFollowLine(){
         piezo.stop();
         _delay_ms(ONE_SECOND);
         current = FollowLine;              //Switch le currentStage a Couloir.
-    }
 }
