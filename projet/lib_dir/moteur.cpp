@@ -70,8 +70,8 @@ void Moteur::changeSpeed(uint8_t left, uint8_t right){
     PORTD = _BV(PORTD4) | _BV(PIND5); 
     dutyCycleLeft_ = calculerPourcentage(left);
     dutyCycleRight_ = calculerPourcentage(right);
-    OCR1A = dutyCycleLeft_;
-    OCR1B = dutyCycleRight_;
+    OCR1B = dutyCycleLeft_;
+    OCR1A = dutyCycleRight_;
 }
 
 /*

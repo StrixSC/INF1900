@@ -119,17 +119,22 @@ void detect(){
 }
 
 void followLine(){
-    if(C3){                              //0 0 1 0 0 
+    if(C1==true){
+        moteur.changeSpeed(0,50);
+    }
+    else if(C2==true){
+        moteur.changeSpeed(0,40);
+    }
+    else if(C3==true){
         moteur.changeSpeed(50,50);
-    }      
-    else if(C2 && C3)                   //0 1 1 0 0 
-        moteur.changeSpeed(40,60); 
-    else if(C3 && C4)                   //0 0 0 1 1
-        moteur.changeSpeed(60,40);      
-    else if(C3 && C4 && C5)             //0 0 1 1 1 -> rightTurn
-        moteur.turnRight(50);
-    else if(C1 && C2 && C3)             //1 1 1 0 0 -> leftTurn
-        moteur.turnLeft(50);
-    else
-        moteur.stopEngine();
+    }
+    else if(C4==true){
+        moteur.changeSpeed(40,0);
+    }
+    else if(C5==true){
+        moteur.changeSpeed(50,0);
+    }
+    else{
+        moteur.changeSpeed(0,0);
+    }
 }
