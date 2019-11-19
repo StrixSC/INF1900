@@ -22,10 +22,10 @@ Fichiers utilisés: Uart.h, includes.h, memoire_24.h, del.h, enums.h, moteur.h
 #define CAPTEUR5 0b00010000
 #define ONE_SECOND 1000
 #define HALF_SECOND 500
-#define AVGSPEED 42
-#define HIGHSPEED 50
+#define AVGSPEED 50
+#define HIGHSPEED 80
 #define LOWSPEED 40
-
+#define NOSPEED 0
 ////////////////////////////////////////////////////////////////
 //Variables et initiation d'objets necessaire pour le programme
 // Memoire24CXXX mem;
@@ -67,8 +67,6 @@ int main(){
     DDRC = 0xFF;
     moteur.startEngine();
     while(true){
-        detect();
-        followLine();
         switch(current){
 
             case FollowLine:
@@ -94,6 +92,7 @@ int main(){
             break;
         }
     }
+}
 }
 
 
@@ -130,50 +129,38 @@ void detect(){
 }
 
 void followLine(){
-    if(C1==true){
-        moteur.changeSpeed(0,50);
-    }
-    else if(C2==true){
-        moteur.changeSpeed(0,40);
-    }
-    else if(C3==true){
-        moteur.changeSpeed(50,50);
-    }
-    else if(C4==true){
-        moteur.changeSpeed(40,0);
-    }
-    else if(C5==true){
-        moteur.changeSpeed(50,0);
-    }
-    else{
-        moteur.changeSpeed(0,0);
-    }
+    if(C1==true)
+        moteur.changeSpeed(NOSPEED,AVGSPEED);
+    else if(C2==true)
+        moteur.changeSpeed(NOSPEED,LOWSPEED);
+    else if(C3==true)
+        moteur.changeSpeed(AVGSPEED,AVGSPEED);
+    else if(C4==true)
+        moteur.changeSpeed(LOWSPEED,NOSPEED);
+    else if(C5==true)
+        moteur.changeSpeed(AVGSPEED,NOSPEED);
+    else
+        moteur.changeSpeed(NOSPEED,NOSPEED);
 }
 
 void dontFollowLine(){
-    if(C1 && !C2 && !C3 && !C4 && C5){              //1 0 0 0 1
-        moteur.changeSpeed(AVGSPEED,AVGSPEED);
-    }
-    else if(C1 && !C2 && !C3 && !C4 && !C5) {              //1 0 0 0 0
-        moteur.changeSpeed(HIGHSPEED,AVGSPEED);                  
-    }
-    else if(!C1 && !C2 && !C3 && !C4 && C5) {              //0 0 0 0 1
-        moteur.changeSpeed(AVGSPEED,HIGHSPEED);                  
-    }
-    else if((!C1 && C2 && !C3 && !C4 && !C5) 
-    || (C1 && C2 && !C3 && !C4 && !C5)){                   //0 1 0 0 0 or 1 1 0 0 0
-        moteur.changeSpeed(HIGHSPEED,AVGSPEED);                  
-    }
-    else if((!C2 && !C3 && C4) 
-    || (!C2 && !C3 && C4 && C5)){                   //0 0 0 1 0 or 0 0 0 1 1
-        moteur.changeSpeed(AVGSPEED,HIGHSPEED);                  
-    }
-
-    else if (C1 && !C2 && C3 && !C4 && C5){
+    if(C1==false)
+        moteur.changeSpeed(AVGSPEED,NOSPEED);
+    else if(C2==false)
+        moteur.changeSpeed(LOWSPEED,NOSPEED);
+    else if(C3==false)
+        moteur.changeSpeed(NOSPEED,NOSPEED);
+    else if(C4==false)
+        moteur.changeSpeed(NOSPEED,LOWSPEED);
+    else if(C5==false)
+        moteur.changeSpeed(NOSPEED,AVGSPEED);
+    else if(C1==true && C3==true && C5==true){
         moteur.stopEngine();
         piezo.beep();
         piezo.stop();
         _delay_ms(ONE_SECOND);
-        current = FollowLine;              //Switch le currentStage a Couloir.
+        current = Mur;
     }
+    else
+        moteur.changeSpeed(HIGHSPEED,HIGHSPEED);
 }
