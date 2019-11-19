@@ -65,28 +65,29 @@ int main(){
     while(true){
         detect();
         followLine();
-        // switch(current){
-        //     case FollowLine:
-        //         detect();
-        //         followLine();   
-        //     break;
+        switch(current){
+            
+            case FollowLine:
+                detect();
+                followLine();   
+            break;
 
-        //     case Couloir:
-        //         detect();
-        //         dontFollowLine();
-        //     break;
+            case Couloir:
+                detect();
+                dontFollowLine();
+            break;
 
-        //     case Mur:  
-        //         // TODO
-        //     break;
+            case Mur:  
+                // TODO
+            break;
 
-        //     case Coupures:
-        //         // TODO
-        //     break;
+            case Coupures:
+                // TODO
+            break;
 
-        //     case Boucles:
-        //         // TODO
-        //     break;
+            case Boucles:
+                // TODO
+            break;
     }
 }
 

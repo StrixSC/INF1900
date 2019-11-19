@@ -13,7 +13,8 @@ class Piezo {
         void play(uint8_t note);
         void stop();
         void playSpongeBob();
-
+        void beep();
+        
         //BACKEND//
         void init();
 
