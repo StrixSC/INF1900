@@ -88,6 +88,7 @@ int main(){
             break;
     }
 }
+}
 
 
 /*
@@ -123,42 +124,31 @@ void detect(){
 }
 
 void followLine(){
-    if(C1==true){
+    if(C1==true)
         moteur.changeSpeed(NOSPEED,AVGSPEED);
-    }
-    else if(C2==true){
+    else if(C2==true)
         moteur.changeSpeed(NOSPEED,LOWSPEED);
-    }
-    else if(C3==true){
+    else if(C3==true)
         moteur.changeSpeed(AVGSPEED,AVGSPEED);
-    }
-    else if(C4==true){
+    else if(C4==true)
         moteur.changeSpeed(LOWSPEED,NOSPEED);
-    }
-    else if(C5==true){
+    else if(C5==true)
         moteur.changeSpeed(AVGSPEED,NOSPEED);
-    }
-    else{
+    else
         moteur.changeSpeed(NOSPEED,NOSPEED);
-    }
 }
 
 void dontFollowLine(){
-    if(C1==false){
+    if(C1==false)
         moteur.changeSpeed(AVGSPEED,NOSPEED);
-    }
-    else if(C2==false){
+    else if(C2==false)
         moteur.changeSpeed(LOWSPEED,NOSPEED);
-    }
-    else if(C3==false){
+    else if(C3==false)
         moteur.changeSpeed(NOSPEED,NOSPEED);
-    }
-    else if(C4==false){
+    else if(C4==false)
         moteur.changeSpeed(NOSPEED,LOWSPEED);
-    }
-    else if(C5==false){
+    else if(C5==false)
         moteur.changeSpeed(NOSPEED,AVGSPEED);
-    }
     else if(C1==true && C3==true && C5==true){
         moteur.stopEngine();
         piezo.beep();
@@ -166,7 +156,6 @@ void dontFollowLine(){
         _delay_ms(ONE_SECOND);
         current = Mur;
     }
-    else{
+    else
         moteur.changeSpeed(HIGHSPEED,HIGHSPEED);
-    }
 }
