@@ -35,6 +35,8 @@ Moteur moteur;
 Piezo piezo;
 enum CurrentSection {FollowLine, Couloir, Mur, Coupures, Boucles};
 CurrentSection current = FollowLine;
+static void banner(LCM&, char*, uint16_t);
+static void wave(LCM&, uint16_t, uint16_t);
 ///////////////////////////////////////////////////////////////
 //Variable boolean pour le stade de nos capteurs
 bool C1 = false;
@@ -47,6 +49,7 @@ bool C5 = false;
 void detect();
 void followLine();
 void dontFollowLine();
+void leMur();
 ///////////////////////////////////////////////////////
 ///////////                                 ///////////
 ///////////               MAIN              ///////////
@@ -61,6 +64,7 @@ int main(){
     DDRA = 0x00; //mode entrée
     DDRB = 0xFF; //mode sortie
     DDRD = 0xFF;
+    DDRC = 0xFF;
     moteur.startEngine();
     while(true){
         detect();
@@ -88,6 +92,7 @@ int main(){
             case Boucles:
                 // TODO
             break;
+        }
     }
 }
 
@@ -170,4 +175,5 @@ void dontFollowLine(){
         piezo.stop();
         _delay_ms(ONE_SECOND);
         current = FollowLine;              //Switch le currentStage a Couloir.
+    }
 }
