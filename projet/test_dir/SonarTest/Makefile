@@ -1,8 +1,8 @@
 # Nom de votre projet
 # (utilisez un seul mot, exemple: 'monprojet')
-PROJECTNAME=LCDTest
+PROJECTNAME=SonarTest
 # Fichiers sources
-PRJSRC= LCDTest.cpp
+PRJSRC= SonarTest.cpp
 
 ##### A VERIFIER #####
 # LIBRAIRIE= $(libRobot).a
@@ -16,10 +16,10 @@ PRJSRC= LCDTest.cpp
 # 	$(AR) -crs $(LIBSRC) $^ 
 
 # Inclusions additionnels (ex: -I/path/to/mydir)
-INC= -I ../lib_dir/
+INC= -I../../lib_dir/
 
 # Libraires a lier (ex: -lmylib)
-LIBS= ../lib_dir/libRobot.a
+LIBS= ../../lib_dir/libRobot.a
 
 #Nom des cibles par defaut
 TRG=$(PROJECTNAME).out
@@ -29,7 +29,7 @@ HEXTRG=$(HEXROMTRG) $(PROJECTNAME).ee.hex
 # Make all permet simplement de compiler le projet
 all: $(TRG)
 
-include ../Makefile_Common
+include ../../Makefile_Common
 
 #$(MAKE) execute make pour la lib_dir, comme ca nous n'avons pas besoin de changer de repertoire pour make.
 # Implementation de la cible

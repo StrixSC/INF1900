@@ -64,11 +64,11 @@ HEXFORMAT=ihex
 CFLAGS=-I. -MMD $(INC) -g -mmcu=$(MCU) -O$(OPTLEVEL) \
 	-fpack-struct -fshort-enums             \
 	-funsigned-bitfields -funsigned-char    \
-	-Wall \ 
-	-DF_CPU=8000000UL                                         
+	-Wall                                   
 
 # Flags pour le compilateur en C++
-CXXFLAGS=-fno-exceptions 
+CXXFLAGS=-fno-exceptions					\
+-DF_CPU=8000000UL
 
 # Linker pour lier les librairies utilisees
 LDFLAGS=-Wl,-Map,$(TRG).map -mmcu=$(MCU)
