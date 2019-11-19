@@ -142,6 +142,18 @@ void followLine(){
         moteur.changeSpeed(AVGSPEED,NOSPEED);
     else
         moteur.changeSpeed(NOSPEED,NOSPEED);
+    else if(C1==true && C2 == true && C3 == true){  // a gauche
+        moteur.stopEngine(); 
+        delay_ms(1); 
+        moteur.startEngine(); 
+        current= FollowLine; 
+    }
+    else if(C3==true && C4 == true && C5 == true){  // a droite
+        moteur.stopEngine(); 
+        delay_ms(1); 
+        moteur.startEngine(); 
+        current= FollowLine; 
+    }
 }
 
 void dontFollowLine(){
