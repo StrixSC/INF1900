@@ -61,23 +61,25 @@ void sonarSendPulse(){
 }
 
 void sonarReadOutput(uint8_t &counter){
-    while(PIND & 0b01){
+    while(PIND & 0b00000001){
         counter++;
     }
 }
 
 int main(){
-    uint8_t counter = 0; 
-    DDRD = 0x11110010; //mode entree
+    uint8_t counter = 0;
+    DDRD = 0x11110001; //mode entree
     DDRB = 0xFF; //mode sortie
 
     while(true){
         sonarSendPulse();
         sonarReadOutput(counter);
         uint8_t distanceEnCm = counter/58;      //A la fin, on divise le counter par 58 pour obtenir la distance en cm 
-        if(distanceEnCm >= 15){
+        if(distanceEnCm <= 16 && distanceEnCm >= 14){
             del.vert();                         //Si la distance est plus plus grande que 13; on allume la del en vert;
-            _delay_ms(1000);
+        }
+        else {
+            del.eteindre();
         }
         
         counter=0;
