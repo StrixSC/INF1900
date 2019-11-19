@@ -36,6 +36,13 @@ void Piezo::play(uint8_t key){
     OCR0A = dutyCycle; 
 }
 
+void Piezo::beep(){
+        play(65);
+        _delay_ms(500);
+        play(65);
+        _delay_ms(500);
+}
+
 void Piezo::playSpongeBob(){
     uint8_t song = 1;
     while (song){

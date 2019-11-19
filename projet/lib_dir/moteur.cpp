@@ -70,8 +70,13 @@ void Moteur::changeSpeed(uint8_t left, uint8_t right){
     PORTD = _BV(PORTD4) | _BV(PIND5); 
     dutyCycleLeft_ = calculerPourcentage(left);
     dutyCycleRight_ = calculerPourcentage(right);
+<<<<<<< HEAD
+    OCR1A = dutyCycleRight_;
+    OCR1B = dutyCycleLeft_;
+=======
     OCR1B = dutyCycleLeft_;
     OCR1A = dutyCycleRight_;
+>>>>>>> 23a54ae3c06585a2fbce93483b9b4782e013983c
 }
 
 /*
@@ -86,8 +91,8 @@ void Moteur::reverse(uint8_t left, uint8_t right){
     PORTD = _BV(PORTD6)| _BV(PORTD7) | _BV(PORTD4) | _BV(PIND5);    
     dutyCycleLeft_ = calculerPourcentage(left);
     dutyCycleRight_ = calculerPourcentage(right);
-    OCR1A = dutyCycleLeft_;
-    OCR1B = dutyCycleRight_;
+    OCR1A = dutyCycleRight_;
+    OCR1B = dutyCycleLeft_;
 }
 
 void Moteur::turnLeft(uint8_t speed){

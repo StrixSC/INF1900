@@ -8,3 +8,12 @@ Liste de todos pour le PROJET:
     ✔ TODO: initRightTurn() -> dans la classe moteur svp :) @done(19-11-12 01:25)
     ✔ TODO: initLeftTurn() -> dans la classe moteur svp :) @done(19-11-12 01:25)
     ✔ TODO: moteur.reverse (go backwards) @started(19-11-12 01:25) @done(19-11-12 01:25) @lasted(56s)
+
+    ☐ Ajuster les valeurs du followLine a la perfection (Le followline doit etre impeccable, car il est la base du programe entier)
+    
+
+    ☐ Le Mur:
+        ☐ Ajuster les ports pour permettre le captage et le output des valeurs du sonar
+        ☐ Verifier le bon fonctionnement du sonar
+
+    

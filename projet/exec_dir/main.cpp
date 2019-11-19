@@ -14,21 +14,27 @@ Fichiers utilisés: Uart.h, includes.h, memoire_24.h, del.h, enums.h, moteur.h
 #include "moteur.h"
 #include "piezo.h"
 #include "can.h"
-// #include "LightSensor.h"
 
 #define CAPTEUR1 0b00000001
 #define CAPTEUR2 0b00000010
 #define CAPTEUR3 0b00000100
 #define CAPTEUR4 0b00001000
 #define CAPTEUR5 0b00010000
-
+#define ONE_SECOND 1000
+#define HALF_SECOND 500
+#define AVGSPEED 50
+#define HIGHSPEED 80
+#define LOWSPEED 40
+#define NOSPEED 0
 ////////////////////////////////////////////////////////////////
 //Variables et initiation d'objets necessaire pour le programme
 // Memoire24CXXX mem;
 // UART uart;
 Del del;
 Moteur moteur;
-// Piezo piezo;
+Piezo piezo;
+enum CurrentSection {FollowLine, Couloir, Mur, Coupures, Boucles};
+CurrentSection current = FollowLine;
 ///////////////////////////////////////////////////////////////
 //Variable boolean pour le stade de nos capteurs
 bool C1 = false;
@@ -37,17 +43,17 @@ bool C3 = false;
 bool C4 = false;
 bool C5 = false;
 ///////////////////////////////////////////////////////////////
-//Definition des fonctions
-void seanceInit();
+//Definition des fonctions utilisees dans se fichier
 void detect();
 void followLine();
+void dontFollowLine();
 ///////////////////////////////////////////////////////
 ///////////                                 ///////////
 ///////////               MAIN              ///////////
 ///////////                                 ///////////
 ///////////////////////////////////////////////////////
 /*
-@Brief: 
+@Brief: Fonction main
 @param: void;
 @return: int;
 */
@@ -56,35 +62,33 @@ int main(){
     DDRB = 0xFF; //mode sortie
     DDRD = 0xFF;
     moteur.startEngine();
-
     while(true){
-        detect();
-        followLine();
+        switch(current){
+
+            case FollowLine:
+                detect();
+                followLine();   
+            break;
+
+            case Couloir:
+                detect();
+                dontFollowLine();
+            break;
+
+            case Mur:  
+                // TODO
+            break;
+
+            case Coupures:
+                // TODO
+            break;
+
+            case Boucles:
+                // TODO
+            break;
     }
 }
 
-/*
-@Brief: Cette fonction ne sert qu'a faire clignoter la del en rouge 2 fois et 
-en vert deux fois, pour signifier le debut de la routine.
-@param: void;
-@return void;
-*/
-void seanceInit(){
-   for(uint8_t i =0; i<2; i++){
-       del.rouge();
-       _delay_ms(500);
-       del.eteindre();
-       _delay_ms(500);
-   }
-
-   for(uint8_t i =0; i<2; i++){
-       del.vert();
-       _delay_ms(500);
-       del.eteindre();
-       _delay_ms(500);
-   }
-
-}
 
 /*
 @Brief: Modifie le stade des variables de capteurs dependamment du signal que le 
@@ -120,27 +124,49 @@ void detect(){
 
 void followLine(){
     if(C1==true){
-        moteur.changeSpeed(0,50);
+        moteur.changeSpeed(NOSPEED,AVGSPEED);
     }
     else if(C2==true){
-        moteur.changeSpeed(0,40);
+        moteur.changeSpeed(NOSPEED,LOWSPEED);
     }
     else if(C3==true){
-        moteur.changeSpeed(50,50);
+        moteur.changeSpeed(AVGSPEED,AVGSPEED);
     }
     else if(C4==true){
-        moteur.changeSpeed(40,0);
+        moteur.changeSpeed(LOWSPEED,NOSPEED);
     }
     else if(C5==true){
-        moteur.changeSpeed(50,0);
-    }
-    else if(C4 && C5 ==true){
-        moteur.turnRight(80);
-    }
-    else if(C1 && C2 ==true){
-        moteur.turnLeft(80);
+        moteur.changeSpeed(AVGSPEED,NOSPEED);
     }
     else{
-        moteur.changeSpeed(0,0);
+        moteur.changeSpeed(NOSPEED,NOSPEED);
+    }
+}
+
+void dontFollowLine(){
+    if(C1==false){
+        moteur.changeSpeed(AVGSPEED,NOSPEED);
+    }
+    else if(C2==false){
+        moteur.changeSpeed(LOWSPEED,NOSPEED);
+    }
+    else if(C3==false){
+        moteur.changeSpeed(NOSPEED,NOSPEED);
+    }
+    else if(C4==false){
+        moteur.changeSpeed(NOSPEED,LOWSPEED);
+    }
+    else if(C5==false){
+        moteur.changeSpeed(NOSPEED,AVGSPEED);
+    }
+    else if(C1==true && C3==true && C5==true){
+        moteur.stopEngine();
+        piezo.beep();
+        piezo.stop();
+        _delay_ms(ONE_SECOND);
+        current = Mur;
+    }
+    else{
+        moteur.changeSpeed(HIGHSPEED,HIGHSPEED);
     }
 }
