@@ -142,16 +142,18 @@ void followLine(){
         moteur.changeSpeed(AVGSPEED,NOSPEED);
     else if(C5==true && C3 == true){  // a gauche
         moteur.stopEngine(); 
-        /*_delay_ms(3000); 
+        _delay_ms(ONE_SECOND); 
         moteur.turnLeft(70); 
-        current= FollowLine; */
-    }/*
+        _delay_ms(ONE_SECOND);
+        current= FollowLine;
+    }
     else if(C3==true  && C5 == true ){  // a droite
         moteur.stopEngine(); 
-        _delay_ms(1); 
-        moteur.startEngine(); 
+        _delay_ms(ONE_SECOND); 
+        moteur.turnRight(70); 
+        _delay_ms(ONE_SECOND);
         current= FollowLine; 
-    }*/
+    }
     else
         moteur.changeSpeed(NOSPEED,NOSPEED);
 }
