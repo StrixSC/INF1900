@@ -20,9 +20,15 @@ Fichiers utilisés:
 #define CAPTEUR5 0b00010000
 #define ONE_SECOND 1000
 #define HALF_SECOND 500
+<<<<<<< HEAD
 #define AVGSPEED 60
 #define HIGHSPEED 80
 #define LOWSPEED 50
+=======
+#define AVGSPEED 70
+#define HIGHSPEED 100
+#define LOWSPEED 60
+>>>>>>> b6e07495b3a0d1a12558e1806a931abae2440740
 #define NOSPEED 0
 ////////////////////////////////////////////////////////////////
 //Variables et initiation d'objets necessaire pour le programme
@@ -33,6 +39,11 @@ Moteur moteur;
 Piezo piezo;
 enum CurrentSection {FollowLine, Couloir, Mur, Coupures, Boucles};
 CurrentSection current = FollowLine;
+<<<<<<< HEAD
+=======
+/*static void banner(LCM&, char*, uint16_t);
+static void wave(LCM&, uint16_t, uint16_t);*/
+>>>>>>> b6e07495b3a0d1a12558e1806a931abae2440740
 ///////////////////////////////////////////////////////////////
 //Variable boolean pour le stade de nos capteurs
 bool C1 = false;
@@ -94,6 +105,7 @@ int main(){
 
             case Mur:  
                 detect();
+                //leMur();
             break;
 
             case Coupures:
@@ -104,7 +116,8 @@ int main(){
                 detect();
             break;
         }
-    }
+}
+
 
 
 
@@ -141,29 +154,56 @@ void detect(){
 }
 
 void followLine(){
-    while(current == FollowLine){
-        detect();
-        if(C1 && C2 && C3){
-            turnLeft = true;
-            break;
-        }
-        else if(C3 && C4 && C5){
-            turnRight = true;
-            break;
-        }
-        if(C1==true)
-            moteur.changeSpeed(NOSPEED,AVGSPEED);
-        else if(C2==true)
-            moteur.changeSpeed(NOSPEED,LOWSPEED);
-        else if(C3==true)
-            moteur.changeSpeed(AVGSPEED,AVGSPEED);
-        else if(C4==true)
-            moteur.changeSpeed(LOWSPEED,NOSPEED);
-        else if(C5==true)
-            moteur.changeSpeed(AVGSPEED,NOSPEED);
-        else
-            moteur.changeSpeed(NOSPEED,NOSPEED);
+    //Turn Sequence TEST. Do not delete please -Nawras
+    // while(current == FollowLine){
+    //     detect();
+    //     if(C1 && C2 && C3){
+    //         turnLeft = true;
+    //         break;
+    //     }
+    //     else if(C3 && C4 && C5){
+    //         turnRight = true;
+    //         break;
+    //     }
+    //     if(C1==true)
+    //         moteur.changeSpeed(NOSPEED,AVGSPEED);
+    //     else if(C2==true)
+    //         moteur.changeSpeed(NOSPEED,LOWSPEED);
+    //     else if(C3==true)
+    //         moteur.changeSpeed(AVGSPEED,AVGSPEED);
+    //     else if(C4==true)
+    //         moteur.changeSpeed(LOWSPEED,NOSPEED);
+    //     else if(C5==true)
+    //         moteur.changeSpeed(AVGSPEED,NOSPEED);
+    //     else
+    //         moteur.changeSpeed(NOSPEED,NOSPEED);
+    // }
+    if(C1==true)
+        moteur.changeSpeed(NOSPEED,AVGSPEED);
+    else if(C2==true)
+        moteur.changeSpeed(NOSPEED,LOWSPEED);
+    else if(C3==true && C5==false)
+        moteur.changeSpeed(AVGSPEED,AVGSPEED);
+    else if(C4==true)
+        moteur.changeSpeed(LOWSPEED,NOSPEED);
+    else if(C5==true && C3==false)
+        moteur.changeSpeed(AVGSPEED,NOSPEED);
+    else if(C5==true && C3 == true){  // a gauche
+        moteur.stopEngine(); 
+        _delay_ms(ONE_SECOND); 
+        moteur.turnLeft(70); 
+        _delay_ms(ONE_SECOND);
+        current= FollowLine;
     }
+    else if(C3==true  && C5 == true ){  // a droite
+        moteur.stopEngine(); 
+        _delay_ms(ONE_SECOND); 
+        moteur.turnRight(70); 
+        _delay_ms(ONE_SECOND);
+        current= FollowLine; 
+    }
+    else
+        moteur.changeSpeed(NOSPEED,NOSPEED);
 }
 
 void dontFollowLine(){
