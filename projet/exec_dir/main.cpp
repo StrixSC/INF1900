@@ -22,9 +22,9 @@ Fichiers utilisés: Uart.h, includes.h, memoire_24.h, del.h, enums.h, moteur.h
 #define CAPTEUR5 0b00010000
 #define ONE_SECOND 1000
 #define HALF_SECOND 500
-#define AVGSPEED 50
-#define HIGHSPEED 80
-#define LOWSPEED 40
+#define AVGSPEED 70   
+#define HIGHSPEED 100  
+#define LOWSPEED 60
 #define NOSPEED 0
 ////////////////////////////////////////////////////////////////
 //Variables et initiation d'objets necessaire pour le programme
@@ -35,8 +35,6 @@ Moteur moteur;
 Piezo piezo;
 enum CurrentSection {FollowLine, Couloir, Mur, Coupures, Boucles};
 CurrentSection current = FollowLine;
-static void banner(LCM&, char*, uint16_t);
-static void wave(LCM&, uint16_t, uint16_t);
 ///////////////////////////////////////////////////////////////
 //Variable boolean pour le stade de nos capteurs
 bool C1 = false;
@@ -76,12 +74,11 @@ int main(){
 
             case Couloir:
                 detect();
-                dontFollowLine();
+            // dontFollowLine();
             break;
 
             case Mur:  
                 detect();
-                leMur();
             break;
 
             case Coupures:
@@ -94,7 +91,7 @@ int main(){
         }
     }
 }
-}
+
 
 
 /*
@@ -130,6 +127,8 @@ void detect(){
 }
 
 void followLine(){
+
+
     if(C1==true)
         moteur.changeSpeed(NOSPEED,AVGSPEED);
     else if(C2==true)
@@ -140,20 +139,27 @@ void followLine(){
         moteur.changeSpeed(LOWSPEED,NOSPEED);
     else if(C5==true)
         moteur.changeSpeed(AVGSPEED,NOSPEED);
+
     else
         moteur.changeSpeed(NOSPEED,NOSPEED);
-    else if(C1==true && C2 == true && C3 == true){  // a gauche
+    
+    if(C1==true && C2 == true && C3 == true){  // a gauche
+
         moteur.stopEngine(); 
-        delay_ms(1); 
-        moteur.startEngine(); 
-        current= FollowLine; 
+        _delay_ms(HALF_SECOND); 
+        del.rouge(); 
+        moteur.turnLeft(AVGSPEED);
+        _delay_ms(ONE_SECOND);
+      
     }
     else if(C3==true && C4 == true && C5 == true){  // a droite
-        moteur.stopEngine(); 
-        delay_ms(1); 
-        moteur.startEngine(); 
-        current= FollowLine; 
+
+        moteur.stopEngine();
+        del.vert();  
+        moteur.turnRight(AVGSPEED);
+        _delay_ms(ONE_SECOND);
     }
+
 }
 
 void dontFollowLine(){
