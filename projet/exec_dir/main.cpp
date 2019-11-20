@@ -22,8 +22,8 @@ Fichiers utilisés: Uart.h, includes.h, memoire_24.h, del.h, enums.h, moteur.h
 #define CAPTEUR5 0b00010000
 #define ONE_SECOND 1000
 #define HALF_SECOND 500
-#define AVGSPEED 70   
-#define HIGHSPEED 100  
+#define AVGSPEED 70
+#define HIGHSPEED 100
 #define LOWSPEED 60
 #define NOSPEED 0
 ////////////////////////////////////////////////////////////////
@@ -35,6 +35,8 @@ Moteur moteur;
 Piezo piezo;
 enum CurrentSection {FollowLine, Couloir, Mur, Coupures, Boucles};
 CurrentSection current = FollowLine;
+/*static void banner(LCM&, char*, uint16_t);
+static void wave(LCM&, uint16_t, uint16_t);*/
 ///////////////////////////////////////////////////////////////
 //Variable boolean pour le stade de nos capteurs
 bool C1 = false;
@@ -74,11 +76,12 @@ int main(){
 
             case Couloir:
                 detect();
-            // dontFollowLine();
+                dontFollowLine();
             break;
 
             case Mur:  
                 detect();
+                //leMur();
             break;
 
             case Coupures:
@@ -127,39 +130,30 @@ void detect(){
 }
 
 void followLine(){
-
-
     if(C1==true)
         moteur.changeSpeed(NOSPEED,AVGSPEED);
     else if(C2==true)
         moteur.changeSpeed(NOSPEED,LOWSPEED);
-    else if(C3==true)
+    else if(C3==true && C5==false)
         moteur.changeSpeed(AVGSPEED,AVGSPEED);
     else if(C4==true)
         moteur.changeSpeed(LOWSPEED,NOSPEED);
-    else if(C5==true)
+    else if(C5==true && C3==false)
         moteur.changeSpeed(AVGSPEED,NOSPEED);
-
+    else if(C5==true && C3 == true){  // a gauche
+        moteur.stopEngine(); 
+        /*_delay_ms(3000); 
+        moteur.turnLeft(70); 
+        current= FollowLine; */
+    }/*
+    else if(C3==true  && C5 == true ){  // a droite
+        moteur.stopEngine(); 
+        _delay_ms(1); 
+        moteur.startEngine(); 
+        current= FollowLine; 
+    }*/
     else
         moteur.changeSpeed(NOSPEED,NOSPEED);
-    
-    if(C1==true && C2 == true && C3 == true){  // a gauche
-
-        moteur.stopEngine(); 
-        _delay_ms(HALF_SECOND); 
-        del.rouge(); 
-        moteur.turnLeft(AVGSPEED);
-        _delay_ms(ONE_SECOND);
-      
-    }
-    else if(C3==true && C4 == true && C5 == true){  // a droite
-
-        moteur.stopEngine();
-        del.vert();  
-        moteur.turnRight(AVGSPEED);
-        _delay_ms(ONE_SECOND);
-    }
-
 }
 
 void dontFollowLine(){
