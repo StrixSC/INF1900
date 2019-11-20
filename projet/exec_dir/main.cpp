@@ -77,24 +77,25 @@ int main(){
     moteur.startEngine();
         switch(current){
             case FollowLine:
-                if(turnRight){
-                    stopSequence();
-                        del.vert();
-                        moteur.turnRight(AVGSPEED);
-                        _delay_ms(1000);
-                        del.eteindre();
-                    turnRight = false;
-                }
-                else if(turnLeft){
-                    stopSequence();
-                    while(!C3){
-                        del.rouge();
-                        moteur.turnLeft(AVGSPEED);
-                        _delay_ms(1000);
-                        del.eteindre();
+                //Turn sequence test. Do not delete please - Nawras
+                // if(turnRight){
+                //     stopSequence();
+                //         del.vert();
+                //         moteur.turnRight(AVGSPEED);
+                //         _delay_ms(1000);
+                //         del.eteindre();
+                //     turnRight = false;
+                // }
+                // else if(turnLeft){
+                //     stopSequence();
+                //     while(!C3){
+                //         del.rouge();
+                //         moteur.turnLeft(AVGSPEED);
+                //         _delay_ms(1000);
+                //         del.eteindre();
 
-                    }
-                }
+                //     }
+                // }
                 followLine();
             break;
 
