@@ -1,9 +1,7 @@
 /**************************************************************************************************************************
 Auteurs: Nawras Mohammed Amin, John Maliha, Johnny Khoury, Fadi Nourredine
-Description: Ce fichier permet de faire passer au robot différents états pour lui faire faire ce que nous désirons en fonction de ce qu'il lui est passé en paramètres
-            grâce aux états du switch case.
-Fichiers utilisés: Uart.h, includes.h, memoire_24.h, del.h, enums.h, moteur.h
-
+Description: 
+Fichiers utilisés: 
 **************************************************************************************************************************/
 
 #include "UART.h"
@@ -22,9 +20,9 @@ Fichiers utilisés: Uart.h, includes.h, memoire_24.h, del.h, enums.h, moteur.h
 #define CAPTEUR5 0b00010000
 #define ONE_SECOND 1000
 #define HALF_SECOND 500
-#define AVGSPEED 50
+#define AVGSPEED 60
 #define HIGHSPEED 80
-#define LOWSPEED 40
+#define LOWSPEED 50
 #define NOSPEED 0
 ////////////////////////////////////////////////////////////////
 //Variables et initiation d'objets necessaire pour le programme
@@ -35,8 +33,6 @@ Moteur moteur;
 Piezo piezo;
 enum CurrentSection {FollowLine, Couloir, Mur, Coupures, Boucles};
 CurrentSection current = FollowLine;
-static void banner(LCM&, char*, uint16_t);
-static void wave(LCM&, uint16_t, uint16_t);
 ///////////////////////////////////////////////////////////////
 //Variable boolean pour le stade de nos capteurs
 bool C1 = false;
@@ -44,12 +40,15 @@ bool C2 = false;
 bool C3 = false; 
 bool C4 = false;
 bool C5 = false;
+bool turnLeft = false;
+bool turnRight = false;
 ///////////////////////////////////////////////////////////////
 //Definition des fonctions utilisees dans se fichier
 void detect();
 void followLine();
 void dontFollowLine();
 void leMur();
+void stopSequence();
 ///////////////////////////////////////////////////////
 ///////////                                 ///////////
 ///////////               MAIN              ///////////
@@ -64,14 +63,28 @@ int main(){
     DDRA = 0x00; //mode entrée
     DDRB = 0xFF; //mode sortie
     DDRD = 0xFF;
-    DDRC = 0xFF;
     moteur.startEngine();
-    while(true){
         switch(current){
-
             case FollowLine:
-                detect();
-                followLine();   
+                if(turnRight){
+                    stopSequence();
+                        del.vert();
+                        moteur.turnRight(AVGSPEED);
+                        _delay_ms(1000);
+                        del.eteindre();
+                    turnRight = false;
+                }
+                else if(turnLeft){
+                    stopSequence();
+                    while(!C3){
+                        del.rouge();
+                        moteur.turnLeft(AVGSPEED);
+                        _delay_ms(1000);
+                        del.eteindre();
+
+                    }
+                }
+                followLine();
             break;
 
             case Couloir:
@@ -81,20 +94,18 @@ int main(){
 
             case Mur:  
                 detect();
-                leMur();
             break;
 
             case Coupures:
-                // TODO
+                detect();
             break;
 
             case Boucles:
-                // TODO
+                detect();
             break;
         }
     }
-}
-}
+
 
 
 /*
@@ -130,18 +141,29 @@ void detect(){
 }
 
 void followLine(){
-    if(C1==true)
-        moteur.changeSpeed(NOSPEED,AVGSPEED);
-    else if(C2==true)
-        moteur.changeSpeed(NOSPEED,LOWSPEED);
-    else if(C3==true)
-        moteur.changeSpeed(AVGSPEED,AVGSPEED);
-    else if(C4==true)
-        moteur.changeSpeed(LOWSPEED,NOSPEED);
-    else if(C5==true)
-        moteur.changeSpeed(AVGSPEED,NOSPEED);
-    else
-        moteur.changeSpeed(NOSPEED,NOSPEED);
+    while(current == FollowLine){
+        detect();
+        if(C1 && C2 && C3){
+            turnLeft = true;
+            break;
+        }
+        else if(C3 && C4 && C5){
+            turnRight = true;
+            break;
+        }
+        if(C1==true)
+            moteur.changeSpeed(NOSPEED,AVGSPEED);
+        else if(C2==true)
+            moteur.changeSpeed(NOSPEED,LOWSPEED);
+        else if(C3==true)
+            moteur.changeSpeed(AVGSPEED,AVGSPEED);
+        else if(C4==true)
+            moteur.changeSpeed(LOWSPEED,NOSPEED);
+        else if(C5==true)
+            moteur.changeSpeed(AVGSPEED,NOSPEED);
+        else
+            moteur.changeSpeed(NOSPEED,NOSPEED);
+    }
 }
 
 void dontFollowLine(){
@@ -164,4 +186,28 @@ void dontFollowLine(){
     }
     else
         moteur.changeSpeed(HIGHSPEED,HIGHSPEED);
+}
+
+void stopSequence(){
+    moteur.stopEngine();
+    _delay_ms(ONE_SECOND);
+    moteur.changeSpeed(LOWSPEED, LOWSPEED);
+    _delay_ms(ONE_SECOND);
+}
+
+void turnSequence(){
+    if(turnRight){
+        stopSequence();
+        while(!C3){
+            moteur.turnRight(AVGSPEED);
+        }
+        turnRight = false;
+    }
+    else if(turnLeft){
+        stopSequence();
+        while(!C3){
+            moteur.turnLeft(AVGSPEED);
+        }
+        turnLeft = false;
+    }
 }

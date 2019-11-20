@@ -35,6 +35,7 @@ Moteur moteur;
 Piezo piezo;
 enum CurrentSection {FollowLine, Couloir, Mur, Coupures, Boucles};
 CurrentSection current = FollowLine;
+uint8_t counter = 0;
 ///////////////////////////////////////////////////////////////
 //Variable boolean pour le stade de nos capteurs
 bool C1 = false;
@@ -55,33 +56,30 @@ bool C5 = false;
 
 void sonarSendPulse(){
     _delay_ms(50);          //50us delay before sending impulse again.
-    PORTD |= _BV(PD1);   //
+    PORTD |= _BV(PD1);   
     _delay_ms(10);
     PORTD &= ~_BV(PD1);
 }
 
-void sonarReadOutput(uint8_t &counter){
+void sonarReadOutput(){
     while(PIND & 0b00000001){
         counter++;
     }
 }
 
 int main(){
-    uint8_t counter = 0;
-    DDRD = 0x11110001; //mode entree
+    DDRD = 0b11110010; //mode entree
     DDRB = 0xFF; //mode sortie
-
     while(true){
         sonarSendPulse();
-        sonarReadOutput(counter);
+        sonarReadOutput();
         uint8_t distanceEnCm = counter/58;      //A la fin, on divise le counter par 58 pour obtenir la distance en cm 
-        if(distanceEnCm <= 16 && distanceEnCm >= 14){
-            del.vert();                         //Si la distance est plus plus grande que 13; on allume la del en vert;
+        if(distanceEnCm <= 5){
+            del.vert();
+            break;
         }
-        else {
+        else {  
             del.eteindre();
         }
-        
-        counter=0;
     }
 }
