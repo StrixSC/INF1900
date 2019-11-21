@@ -20,16 +20,21 @@ void UART::initialisationUART(){
 
 }
 
-//Fonction transmissionUART, prise de la documentation officielle ATMEL
-void UART::transmissionUART(uint8_t donnee)
-{
-    //Wait for empty transmit buffer
-    while(!(UCSR0A & (1<< UDRE0))){
+// //Fonction transmissionUART, prise de la documentation officielle ATMEL
+// void UART::transmissionUART(uint8_t donnee)
+// {
+//     //Wait for empty transmit buffer
+//     while(!(UCSR0A & (1<< UDRE0))){
     
-         UDR0 = donnee;
-    }
-}
+//         UDR0 = donnee;
+//     }
+// }
 
+void UART::transmissionUART(uint8_t donnee){
+    //Wait for empty transmit buffer
+    while(!(UCSR0A & (1<< UDRE0)));
+    UDR0 = donnee;
+}
 //Fonction reception UART, prise de la documentation officielle ATMEL
 uint8_t UART::receptionUART()
 {

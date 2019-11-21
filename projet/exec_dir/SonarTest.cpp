@@ -29,7 +29,7 @@ Fichiers utilisés: Uart.h, includes.h, memoire_24.h, del.h, enums.h, moteur.h
 ////////////////////////////////////////////////////////////////
 //Variables et initiation d'objets necessaire pour le programme
 // Memoire24CXXX mem;
-// UART uart;
+UART uart;
 Del del;
 Moteur moteur;
 Piezo piezo;
@@ -43,6 +43,8 @@ bool C2 = false;
 bool C3 = false; 
 bool C4 = false;
 bool C5 = false;
+
+uint8_t distance;
 ///////////////////////////////////////////////////////
 ///////////                                 ///////////
 ///////////               MAIN              ///////////
@@ -55,28 +57,31 @@ bool C5 = false;
 */
 
 void sonarSendPulse(){
-    _delay_ms(50);          //50us delay before sending impulse again.
-    PORTD |= _BV(PD1);   
-    _delay_ms(10);
-    PORTD &= ~_BV(PD1);
+    PORTA |= _BV(PA0);   
+    _delay_us(15);
+    PORTA &= ~_BV(PA0);
 }
 
 void sonarReadOutput(){
-    while(PIND & 0b00000001){
+    while(!(PINA & _BV(PA1))){}
+    uint16_t counter = 0;
+    while((PINA & _BV(PA1))){
+        _delay_us(0.5);
         counter++;
-    }
+    };
+    distance = (counter/58);
 }
 
 int main(){
-    DDRD = 0b11110010; //mode entree
+    DDRA |= (1 << PA0);
     DDRB = 0xFF; //mode sortie
     while(true){
         sonarSendPulse();
         sonarReadOutput();
-        uint8_t distanceEnCm = counter/58;      //A la fin, on divise le counter par 58 pour obtenir la distance en cm 
-        if(distanceEnCm <= 5){
+        _delay_ms(50);
+        uart.transmissionUART(distance);
+        if(distance >= 14 && distance <= 16){
             del.vert();
-            break;
         }
         else {  
             del.eteindre();
