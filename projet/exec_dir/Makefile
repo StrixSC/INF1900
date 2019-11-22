@@ -2,7 +2,7 @@
 # (utilisez un seul mot, exemple: 'monprojet')
 PROJECTNAME=main
 # Fichiers sources
-PRJSRC= SonarTest.cpp
+PRJSRC= main.cpp
 
 ##### A VERIFIER #####
 # LIBRAIRIE= $(libRobot).a
