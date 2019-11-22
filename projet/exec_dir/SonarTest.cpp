@@ -57,15 +57,15 @@ uint8_t distance;
 */
 
 void sonarSendPulse(){
-    PORTA |= _BV(PA0);   
+    PORTA |= _BV(PA6);   
     _delay_us(15);
-    PORTA &= ~_BV(PA0);
+    PORTA &= ~_BV(PA6);
 }
 
 void sonarReadOutput(){
-    while(!(PINA & _BV(PA1))){}
+    while(!(PINA & _BV(PA7))){}
     uint16_t counter = 0;
-    while((PINA & _BV(PA1))){
+    while((PINA & _BV(PA7))){
         _delay_us(0.5);
         counter++;
     };
@@ -73,7 +73,7 @@ void sonarReadOutput(){
 }
 
 int main(){
-    DDRA |= (1 << PA0);
+    DDRA |= (1 << PA6);
     DDRB = 0xFF; //mode sortie
     while(true){
         sonarSendPulse();
