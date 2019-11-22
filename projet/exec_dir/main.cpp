@@ -21,6 +21,7 @@ Fichiers utilisés: Uart.h, includes.h, memoire_24.h, del.h, enums.h, moteur.h
 #define CAPTEUR5 0b00010000
 
 #define AVGSPEED 60
+#define LOWERAVGSPEED 40
 #define NOSPEED 0
 #define LOWSPEED 30
 #define HIGHSPEED 60
@@ -46,6 +47,8 @@ bool C5;
 volatile uint8_t distance;
 bool turnLeft = false;
 bool turnRight = false;
+uint8_t rightTurnCounter = 4;
+uint8_t leftTurnCounter = 4;
 ///////////////////////////////////////////////////////////////
 //Definition des fonctions
 void seanceInit();
@@ -55,6 +58,8 @@ void dontFollowLine();
 void sonarReadOutput();
 void sonarSendPulse();
 void sonarDetect();
+void stopSequence();
+void receiveUartOutputs();
 ///////////////////////////////////////////////////////
 ///////////                                 ///////////
 ///////////               MAIN              ///////////
@@ -70,28 +75,29 @@ int main(){
     DDRB = 0xFF; //mode sortie
     DDRD = 0xFF;
     moteur.startEngine();
-    current = Mur;
+    current = FollowLine;
     while(true){
         switch(current){
             case FollowLine:
                 //Turn sequence test. Do not delete please - Nawras
-                // if(turnRight){
-                //     stopSequence();
-                //         del.vert();
-                //         moteur.turnRight(AVGSPEED);
-                //         _delay_ms(1000);
-                //         del.eteindre();
-                //     turnRight = false;
-                // }
-                // else if(turnLeft){
-                //     stopSequence();
-                //     while(!C3){
-                //         del.rouge();
-                //         moteur.turnLeft(AVGSPEED);
-                //         _delay_ms(1000);
-                //         del.eteindre();
-                //     }
-                // }
+                if(turnRight && rightTurnCounter){
+                    stopSequence();
+                        del.vert();
+                        moteur.turnRight(HIGHSPEED);
+                        _delay_ms(3000);
+                        del.eteindre();
+                    turnRight = false;
+                }
+                else if(turnLeft && leftTurnCounter){
+                    stopSequence();
+                    while(!C3){
+                        del.rouge();
+                        moteur.turnLeft(HIGHSPEED);
+                        _delay_ms(ONE_SECOND);
+                        del.eteindre();
+                    }
+                    turnLeft = false;
+                }
                 detect();
                 followLine();
             break;
@@ -165,31 +171,68 @@ void detect(){
         C5 = false;
 }
 void followLine(){
-    if(C1==true && C2==false){
-        moteur.changeSpeed(0,50);
+    // if((C1 && C2 && C3 && !C4 && !C5) || (C1 && C2 && C3 && C4 && !C5)){                                              //1 1 1 0 0 OU 1 1 1 1 0 
+    //     turnLeft = true;
+    // }
+    // else if((!C1 && !C2 && C3 && C4 && C5) || (!C1 && C2 && C3 && C4 && C5)){       //0 0 1 1 1 OU 0 1 1 1 1
+    //     turnRight = true;
+    // }
+    // else if((C1 && C2 && !C3 && !C4 && !C5) || (!C1 && C2 && C3 && !C4 && !C5)){    //1 1 0 0 0 OU 0 1 1 0 0
+    //     moteur.changeSpeed(0,AVGSPEED);
+    // }
+    // else if(C1 && !C2 && !C3 && !C4 && !C5){                                        //1 0 0 0 0 
+    //     moteur.changeSpeed(0,AVGSPEED);
+    // }
+    // else if(!C1 && C2 && !C3 && !C4 && !C5){                                        //0 1 0 0 0 
+    //     moteur.changeSpeed(0,LOWERAVGSPEED);
+    // }
+    // else if(
+    //     (!C1 && !C2 && C3 && !C4 && !C5) ||
+    //     (!C1 && C2 && C3 && C4 && !C5)){                        //0 0 1 0 0                       
+    //     moteur.changeSpeed(AVGSPEED,AVGSPEED);
+    // }
+    // else if(!C1 && !C2 && !C3 && C4 && !C5){                        //0 0 0 1 0 
+    //     moteur.changeSpeed(LOWERAVGSPEED,0);
+    // }
+    // else if(!C1 && !C2 && !C3 && !C4 && C5){                        //0 0 0 0 1
+    //     moteur.changeSpeed(AVGSPEED,0);
+    // }
+    // else if(!C1 && !C2 && !C3 && C4 && C5 || (!C1 && !C2 && C3 && C4 && !C5)){ //0 0 0 1 1
+    //     moteur.changeSpeed(LOWERAVGSPEED,0);
+    // }
+    // else {                                                          //0 0 0 0 0
+    //     moteur.changeSpeed(NOSPEED, NOSPEED);
+    // }
+    // /*
+    // else if(C1==false && C2==false && C3==false && C4==false && C5==false){
+    //     moteur.changeSpeed(0,0);
+    // }*/
+
+    
+    if(C1 && C2 && C3 || (C1 && C2 && C3 && C4)){                     //1 1 1 X X ou // 1 1 1 1 X
+        turnLeft = true;
     }
-    else if(C1==false && C2==true){
-        moteur.changeSpeed(0,40);
+    else if(C3 && C4 && C5 || (C2 && C3 && C4 && C5)){                //X X 1 1 1 ou // X 1 1 1 1 
+        turnRight = true;
     }
-    else if(C1==false && C2==false && C3==true){
-        moteur.changeSpeed(50,50);
+    else if(C3 || (C2 && C3 && C4)){        //0 0 1 0 0 OU 0 1 1 1 0 0 
+        moteur.changeSpeed(AVGSPEED, AVGSPEED);
     }
-    else if(C4==true){
-        moteur.changeSpeed(40,0);
+    else if(C2 || (C1 && C2)){              //X 1 X X X OU 1 1 X X X
+        moteur.changeSpeed(NOSPEED, AVGSPEED);
     }
-    else if(C5==true){
-        moteur.changeSpeed(50,0);
+    else if(C4 || (C4 && C5)){              // X X X 1 X OU X X X 1 1
+        moteur.changeSpeed(AVGSPEED, NOSPEED);
     }
-    else if(C1==true && C2==true && C3==true || C1==true && C2==true && C3==true && C4==true){
-        moteur.changeSpeed(0,60);
+    else if(C1){                            //1 X X X X
+        moteur.changeSpeed(NOSPEED, AVGSPEED);
     }
-    else if(C3==true && C4==true && C5==true || C2==true && C3==true && C4==true && C5==true){
-        moteur.changeSpeed(60,0);
+    else if(C5){                            //X X X X 1 
+        moteur.changeSpeed(AVGSPEED, NOSPEED);  
     }
-    /*
-    else if(C1==false && C2==false && C3==false && C4==false && C5==false){
-        moteur.changeSpeed(0,0);
-    }*/
+    else {                                  // X X X X X
+        moteur.changeSpeed(NOSPEED, NOSPEED);
+    }
 }
 void dontFollowLine(){
     if(C1==false)
@@ -214,9 +257,9 @@ void dontFollowLine(){
 }
 
 void stopSequence(){
-    moteur.stopEngine();
+    moteur.changeSpeed(NOSPEED,NOSPEED);
     _delay_ms(ONE_SECOND);
-    moteur.changeSpeed(LOWSPEED, LOWSPEED);
+    moteur.changeSpeed(HIGHSPEED, HIGHSPEED);
     _delay_ms(ONE_SECOND);
 }
 
@@ -277,4 +320,12 @@ void sonarDetect(){
     //     moteur.changeSpeed(AVGSPEED, NOSPEED);
     // }
 
+}
+
+void receiveUartOutputs(){
+    uart.transmissionUART(C1);
+    uart.transmissionUART(C2);
+    uart.transmissionUART(C3);
+    uart.transmissionUART(C4);
+    uart.transmissionUART(C5);
 }

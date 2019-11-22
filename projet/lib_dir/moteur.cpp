@@ -91,11 +91,11 @@ void Moteur::reverse(uint8_t left, uint8_t right){
 }
 
 void Moteur::turnLeft(uint8_t speed){
-    changeSpeed(speed,0);
+    changeSpeed(0,speed);
 }
 
 void Moteur::turnRight(uint8_t speed){
-    changeSpeed(0,speed);
+    changeSpeed(speed,0);
 }
 
 void Moteur::stopEngine(){
