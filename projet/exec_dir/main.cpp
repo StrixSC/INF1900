@@ -59,7 +59,7 @@ void sonarReadOutput();
 void sonarSendPulse();
 void sonarDetect();
 void stopSequence();
-void receiveUartOutputs();
+void turnSequence(const char direction);
 ///////////////////////////////////////////////////////
 ///////////                                 ///////////
 ///////////               MAIN              ///////////
@@ -81,22 +81,10 @@ int main(){
             case FollowLine:
                 //Turn sequence test. Do not delete please - Nawras
                 if(turnRight && rightTurnCounter){
-                    stopSequence();
-                        del.vert();
-                        moteur.turnRight(HIGHSPEED);
-                        _delay_ms(3000);
-                        del.eteindre();
-                    turnRight = false;
+                    turnSequence('r');
                 }
                 else if(turnLeft && leftTurnCounter){
-                    stopSequence();
-                    while(!C3){
-                        del.rouge();
-                        moteur.turnLeft(HIGHSPEED);
-                        _delay_ms(ONE_SECOND);
-                        del.eteindre();
-                    }
-                    turnLeft = false;
+                    turnSequence('l');
                 }
                 detect();
                 followLine();
@@ -259,24 +247,47 @@ void dontFollowLine(){
 void stopSequence(){
     moteur.changeSpeed(NOSPEED,NOSPEED);
     _delay_ms(ONE_SECOND);
-    moteur.changeSpeed(HIGHSPEED, HIGHSPEED);
+    moteur.changeSpeed(AVGSPEED, AVGSPEED);
     _delay_ms(ONE_SECOND);
 }
 
-void turnSequence(){
-    if(turnRight){
+void turnSequence(const char direction){
+    if(direction == 'r'){
         stopSequence();
-        while(!C3){
-            moteur.turnRight(AVGSPEED);
+        uint8_t turnBool = 1;
+        while(turnBool){
+            detect();
+            if(C3 || C4 || C5){
+                del.rouge();
+                turnBool = false;
+            }
+            else{
+                del.vert();
+                moteur.turnRight(AVGSPEED);
+            }
         }
         turnRight = false;
+        // rightTurnCounter--;
     }
-    else if(turnLeft){
+    else if(direction == 'l'){
         stopSequence();
-        while(!C3){
-            moteur.turnLeft(AVGSPEED);
+        uint8_t turnBool = 1;
+        while(turnBool){
+            detect();
+            if(C1 || C2 || C3){
+                del.rouge();
+                turnBool = false;
+            }
+            else{
+                del.vert();
+                moteur.turnLeft(AVGSPEED);
+            }
         }
         turnLeft = false;
+        // leftTurnCounter--;
+    }
+    else {              //Si pas R ou L 
+        return;
     }
 }
 
@@ -320,12 +331,4 @@ void sonarDetect(){
     //     moteur.changeSpeed(AVGSPEED, NOSPEED);
     // }
 
-}
-
-void receiveUartOutputs(){
-    uart.transmissionUART(C1);
-    uart.transmissionUART(C2);
-    uart.transmissionUART(C3);
-    uart.transmissionUART(C4);
-    uart.transmissionUART(C5);
 }
