@@ -35,7 +35,7 @@ UART uart;
 Del del;
 Moteur moteur;
 Piezo piezo;
-enum CurrentSection {FollowLine, Couloir, Mur, Coupures, Boucles};
+enum CurrentSection {Test, FollowLine, Couloir, Mur, Coupures, Boucles};
 CurrentSection current = FollowLine;
 ///////////////////////////////////////////////////////////////
 //Variable boolean pour le stade de nos capteurs
@@ -44,11 +44,24 @@ bool C2;
 bool C3; 
 bool C4;
 bool C5;
+
+//Variables pour la section du Mur
 volatile uint8_t distance;
+
+//Variables pour les turns Left && Right
 bool turnLeft = false;
 bool turnRight = false;
 uint8_t rightTurnCounter = 4;
 uint8_t leftTurnCounter = 4;
+
+//Variables pour la section des boucles:
+bool bigLoop = false;
+bool smallLoop = false;
+bool loopFL = false;
+uint8_t loopSequenceCounter = 0;
+uint8_t endingLoopSequenceCounter = 0;
+
+
 ///////////////////////////////////////////////////////////////
 //Definition des fonctions
 void seanceInit();
@@ -60,6 +73,10 @@ void sonarSendPulse();
 void sonarDetect();
 void stopSequence();
 void turnSequence(const char direction);
+void smallLoopSequence();
+void bigLoopSequence();
+void loopFollowLine();
+void endingLoopSequence();
 ///////////////////////////////////////////////////////
 ///////////                                 ///////////
 ///////////               MAIN              ///////////
@@ -75,9 +92,19 @@ int main(){
     DDRB = 0xFF; //mode sortie
     DDRD = 0xFF;
     moteur.startEngine();
-    current = Couloir;
+    current = Boucles;
     while(true){
         switch(current){
+            case Test:
+                moteur.turnLeft(AVGSPEED);
+                _delay_ms(1000);
+                moteur.turnRight(AVGSPEED);
+                _delay_ms(1000);
+                moteur.changeSpeed(AVGSPEED, AVGSPEED);
+                _delay_ms(1000);
+                moteur.reverse(AVGSPEED, AVGSPEED);
+                _delay_ms(1000);
+            break;
             case FollowLine:
                 //Turn sequence test. Do not delete please - Nawras
                 if(turnRight && rightTurnCounter){
@@ -102,7 +129,29 @@ int main(){
                 detect();
             break;
             case Boucles:
-                detect();
+                loopFL = true;
+                while(loopFL){
+                    detect();
+                    loopFollowLine();
+                    if(loopSequenceCounter == 3){
+                        loopSequenceCounter = 0;
+                        loopFL = false;
+                        bigLoop = true;
+                    }
+                }
+                stopSequence();
+                _delay_ms(100);
+                turnSequence('l');
+                while(bigLoop){
+                    detect();
+                    bigLoopSequence();
+                }
+                stopSequence();
+                turnSequence('l');
+                while(smallLoop){
+                    detect();
+                    smallLoopSequence();
+                }
             break;
         }
     }
@@ -198,9 +247,9 @@ void dontFollowLine(){
 }
 
 void stopSequence(){
-    moteur.changeSpeed(NOSPEED,NOSPEED);
-    _delay_ms(ONE_SECOND);
     moteur.changeSpeed(AVGSPEED, AVGSPEED);
+    _delay_ms(HALF_SECOND);
+    moteur.changeSpeed(NOSPEED,NOSPEED);
     _delay_ms(ONE_SECOND);
 }
 
@@ -216,7 +265,7 @@ void turnSequence(const char direction){
             }
             else{
                 del.vert();
-                moteur.turnRight(AVGSPEED);
+                moteur.turnRight(LOWERAVGSPEED);
             }
         }
         turnRight = false;
@@ -232,8 +281,7 @@ void turnSequence(const char direction){
                 turnBool = false;
             }
             else{
-                del.vert();
-                moteur.turnLeft(AVGSPEED);
+                moteur.turnLeft(LOWERAVGSPEED);
             }
         }
         turnLeft = false;
@@ -284,4 +332,113 @@ void sonarDetect(){
     //     moteur.changeSpeed(AVGSPEED, NOSPEED);
     // }
 
+}
+
+
+void loopFollowLine(){
+    del.rouge();
+    if((C1 && C2 && C3) || (C2 && C3) || (C1 && C2 && C3 && C4) || (C2 && C3 && C4)){
+        _delay_ms(300);
+        if((C1 && C2 && C3) || (C2 && C3) || (C1 && C2 && C3 && C4) || (C2 && C3 && C4))
+            loopSequenceCounter++;
+    }
+    else if(C3 || (C2 && C3 && C4)){                            //X X 1 X X 
+        moteur.changeSpeed(AVGSPEED, AVGSPEED);
+    }
+    else if(C4){
+        moteur.changeSpeed(LOWERAVGSPEED, NOSPEED);
+    }
+    else if((C4 && C5) || C5){        //X X X 1 1 OU X X X 1 X OU X X X X 1
+        moteur.changeSpeed(AVGSPEED, NOSPEED);
+    }
+    else if(C1 || C2){                      // 1 X X X X OU 1 1 X X X 
+        moteur.changeSpeed(NOSPEED, AVGSPEED);
+    }
+    else if(!C1 && !C2 && !C3 && !C4 && !C5){
+        moteur.changeSpeed(NOSPEED, NOSPEED);
+    }
+}
+void bigLoopSequence(){
+    del.vert();
+    if(C1 && C2 && C3 && C4 && C5 || (C2 && C2 && C3 && C4)){
+        bigLoop = false;
+        smallLoop = true;
+    }
+    else if((C1 && C2 && C3) || (C2 && C3) || (C4 && C3 && C2 && C1)){
+        stopSequence();
+        turnSequence('l');
+    }
+    else if(C1){
+        moteur.changeSpeed(NOSPEED, HIGHSPEED);
+    }
+    else if(C2){
+        moteur.changeSpeed(NOSPEED, LOWERAVGSPEED);
+    }
+    else if(C4){
+        moteur.changeSpeed(LOWERAVGSPEED, NOSPEED);
+    }
+    else if(C5){
+        moteur.changeSpeed(HIGHSPEED, NOSPEED);
+    }
+    else if(C3 || C2 && C3 && C4){
+        moteur.changeSpeed(AVGSPEED, AVGSPEED);
+    }
+    else if(!C1 && !C2 && !C3 && !C4 && !C5){
+        moteur.changeSpeed(NOSPEED, NOSPEED);
+    }
+}
+
+void smallLoopSequence(){
+    del.ambre();
+    if((C1 && C2 && C3 && C4 && C5) || (C5 && C2 && C3 && C4)){
+        smallLoop = false;
+    }
+    else if(C1 && C2 && C3 || C2 && C3){
+        stopSequence();
+        turnSequence('l');
+    }
+    else if(C3 || (C2 && C3 && C4)){
+        moteur.changeSpeed(AVGSPEED, AVGSPEED);
+    }
+    else if(C4 || C4 && C5){
+        moteur.changeSpeed(LOWERAVGSPEED, NOSPEED);
+    }
+    else if(C2 || C2 && C1){
+        moteur.changeSpeed(NOSPEED, LOWERAVGSPEED);
+    }
+    else if(C1){
+        moteur.changeSpeed(NOSPEED, AVGSPEED);
+    }
+    else if(C5){
+        moteur.changeSpeed(AVGSPEED, NOSPEED);
+    }
+    else if(!C1 && !C2 && !C3 && !C4 && !C5){
+        moteur.changeSpeed(NOSPEED, NOSPEED);
+    }
+}
+
+void endingLoopSequence(){
+    if((C1 && C2 && C3) || (C2 && C3) || (C1 && C2 && C3 && C4) || (C2 && C3 && C4)){
+        _delay_ms(300);
+        if((C1 && C2 && C3) || (C2 && C3) || (C1 && C2 && C3 && C4) || (C2 && C3 && C4))
+            endingLoopSequenceCounter++;
+    }
+    if(C3 || (C2 && C3 && C4)){
+        moteur.changeSpeed(AVGSPEED, AVGSPEED);
+    }
+    else if(C5){
+        moteur.changeSpeed(AVGSPEED, NOSPEED);
+    }
+    else if(C4 || (C4 && C5)){
+        moteur.changeSpeed(LOWERAVGSPEED, NOSPEED);
+    }
+    else if(C1){
+        moteur.changeSpeed(NOSPEED, AVGSPEED);
+    }
+    else if(C2 || (C2 && C5)){
+        moteur.changeSpeed(NOSPEED, LOWERAVGSPEED);
+    }
+    else if(!C1 && !C2 && !C3 && !C4 && !C5){
+        moteur.changeSpeed(NOSPEED, NOSPEED);
+    }
 }

@@ -67,7 +67,8 @@ la gauche et droite respectivement.
 //PINS: 1100 1111 = 0xCF;
 void Moteur::changeSpeed(uint8_t left, uint8_t right){
     //PORTD = 0 0 1 1 0 0 0 0 -> Direction pins set to low
-    PORTD = _BV(PORTD4) | _BV(PIND5); 
+    PORTD = _BV(PD4) | _BV(PD5); 
+    PORTD &= ~(_BV(PD6)) | ~(_BV(PD7));
     dutyCycleLeft_ = calculerPourcentage(left);
     dutyCycleRight_ = calculerPourcentage(right);
     OCR1B = dutyCycleLeft_;
@@ -82,8 +83,9 @@ la gauche et droite respectivement.
 @Return: void
 */
 void Moteur::reverse(uint8_t left, uint8_t right){
+    PORTD = 0;
     //PORTD = 1 1 1 1 0 0 0 0 -> set direction pins to high
-    PORTD = _BV(PORTD6)| _BV(PORTD7) | _BV(PORTD4) | _BV(PIND5);    
+    PORTD = _BV(PD4) | _BV(PD5) | _BV(PD6) | _BV(PD7); 
     dutyCycleLeft_ = calculerPourcentage(left);
     dutyCycleRight_ = calculerPourcentage(right);
     OCR1A = dutyCycleRight_;
@@ -91,11 +93,21 @@ void Moteur::reverse(uint8_t left, uint8_t right){
 }
 
 void Moteur::turnLeft(uint8_t speed){
-    changeSpeed(0,speed);
+    PORTD = 0; 
+    PORTD = _BV(PD4) | _BV(PD5) | _BV(PD6);
+    dutyCycleLeft_ = calculerPourcentage(speed);
+    dutyCycleRight_ = calculerPourcentage(speed);
+    OCR1B = dutyCycleLeft_;
+    OCR1A = dutyCycleRight_;
 }
 
 void Moteur::turnRight(uint8_t speed){
-    changeSpeed(speed,0);
+    PORTD = 0;
+    PORTD |= _BV(PD4) | _BV(PD5) | _BV(PD7);
+    dutyCycleLeft_ = calculerPourcentage(speed);
+    dutyCycleRight_ = calculerPourcentage(speed);
+    OCR1B = dutyCycleLeft_;
+    OCR1A = dutyCycleRight_;
 }
 
 void Moteur::stopEngine(){
@@ -104,5 +116,4 @@ void Moteur::stopEngine(){
     TIMSK0 = 0;
     OCR1A = 0;
     OCR1B = 0;
-    PORTD = 0;
 }
