@@ -1,6 +1,7 @@
 #include "bouton.h"
 
-    Bouton::Bouton(){}
+    Bouton::Bouton(){
+    }
 
 /*
 @Brief: destructeur de bouton 

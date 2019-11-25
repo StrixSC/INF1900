@@ -15,6 +15,7 @@ Fichiers utilisés: Uart.h, includes.h, memoire_24.h, del.h, enums.h, moteur.h
 #include "can.h"
 #include "lcm_so1602dtr_m_fw.h"
 #include "customprocs.h"
+#include "bouton.h"
 
 // #include "LightSensor.h"
 #define CAPTEUR1 0b00000001
@@ -37,12 +38,17 @@ Fichiers utilisés: Uart.h, includes.h, memoire_24.h, del.h, enums.h, moteur.h
 //Variables et initiation d'objets necessaire pour le programme
 // Memoire24CXXX mem;
 LCM disp(&DEMO_DDR, &DEMO_PORT);
+Bouton btn; 
 UART uart;
 Del del;
 Moteur moteur;
 Piezo piezo;
-enum CurrentSection {Test, FollowLine, Couloir, Mur, Coupures, Boucles};
-CurrentSection current = FollowLine;
+enum CurrentSection {Test, FollowLine, 
+                    Couloir, CouloirAMur, 
+                    Mur, MurABoucles, 
+                    Boucles, BouclesACoupures, 
+                    Coupures, CoupuresACouloir};
+CurrentSection current;
 ///////////////////////////////////////////////////////////////
 //Variable boolean pour le stade de nos capteurs
 bool C1;
@@ -100,22 +106,30 @@ void endingLoopSequence();
 */
 int main(){
     DDRA |= _BV(PA6);
-    DDRB = 0xFF; //mode sortie
-    DDRD = 0xFF;
+    DDRB = 0xFF; 
+    DDRD = 0xF0; 
     moteur.startEngine();
-    current = Test;
+
+    current = Test;                 
+    disp.write("https://TheStrix.ca");
+    w();
     while(true){
         switch(current){
             case Test:
-                disp.write("THE STRIX", 2);
-                w();
+                if(btn.click()){
+                    del.vert();
+                }
+                else{
+                    del.eteindre();
+                }
             break;
+
             case FollowLine:
                 //Turn sequence test. Do not delete please - Nawras
-                if(turnRight && rightTurnCounter){
+                if(turnRight){
                     turnSequence('r');
                 }
-                else if(turnLeft && leftTurnCounter){
+                else if(turnLeft){
                     turnSequence('l');
                 }
                 detect();
@@ -124,15 +138,35 @@ int main(){
 
             case Couloir:
                 detect();
-                dontFollowLine();
+                if(C1 && C2 && C3){
+                    stopSequence();
+                    turnSequence('l');
+                    FollowLine();
+                }
+                else{
+                    dontFollowLine();
+                }
+            break;
+
+            case CouloirAMur:
+                if(!C1 && !C2 && !C3 && !C4 && !C5){
+                    current = Mur;
+                }
             break;
 
             case Mur:  
-                sonarDetect();
+                if(C1 || C2 || C3 || C4 || C5){
+                    current = MurABoucles;
+                }
+                else{
+                    sonarDetect();
+                }
             break;
-            case Coupures:
+
+            case MurABoucles:
                 detect();
             break;
+
             case Boucles:
                 loopFL = true;
                 while(loopFL){
@@ -157,6 +191,18 @@ int main(){
                     detect();
                     smallLoopSequence();
                 }
+            break;
+
+            case BouclesACoupures:
+                detect();
+            break;
+
+            case Coupures:
+                detect();
+            break;
+
+            case CoupuresACouloir:
+                detect();
             break;
         }
     }
@@ -212,40 +258,42 @@ void detect(){
     else if(!(PINA & CAPTEUR5))
         C5 = false;
 }
+
 void followLine(){
-    if(C1 && C2 && C3 || (C1 && C2 && C3 && C4)){                     //1 1 1 X X ou // 1 1 1 1 X
+    if(C1 && C2 && C3 || (C1 && C2 && C3 && C4)){                     
         turnLeft = true;
     }
-    else if(C3 && C4 && C5 || (C2 && C3 && C4 && C5)){                //X X 1 1 1 ou // X 1 1 1 1 
+    else if(C3 && C4 && C5 || (C2 && C3 && C4 && C5)){                 
         turnRight = true;
     }
-    else if(C3 || (C2 && C3 && C4)){        //0 0 1 0 0 OU 0 1 1 1 0 0 
+    else if(!C1 && !C2 && !C3 && !C4 && !C5){                                  
+        moteur.changeSpeed(NOSPEED, NOSPEED);
+    }
+    else if(C3 || (C2 && C3 && C4)){         
         moteur.changeSpeed(AVGSPEED, AVGSPEED);
     }
-    else if(C2 || (C1 && C2)){              //X 1 X X X OU 1 1 X X X
+    else if(C2 || (C1 && C2)){              
         moteur.changeSpeed(NOSPEED, AVGSPEED);
     }
-    else if(C4 || (C4 && C5)){              // X X X 1 X OU X X X 1 1
+    else if(C4 || (C4 && C5)){              
         moteur.changeSpeed(AVGSPEED, NOSPEED);
     }
-    else if(C1){                            //1 X X X X
+    else if(C1){                            
         moteur.changeSpeed(NOSPEED, AVGSPEED);
     }
-    else if(C5){                            //X X X X 1 
+    else if(C5){                            
         moteur.changeSpeed(AVGSPEED, NOSPEED);  
     }
-    else {                                  // X X X X X
-        moteur.changeSpeed(NOSPEED, NOSPEED);
-    }
 }
+
 void dontFollowLine(){
-    if(C5 || (C4 && C5))                                //X X X X 1
+    if(C5 || (C4 && C5))                                
         moteur.changeSpeed(NOSPEED, AVGSPEED);
-    else if(C1 || C2 || (C1 && C2))                           //1 X X X X
+    else if(C1 || C2 || (C1 && C2))                           
         moteur.changeSpeed(AVGSPEED, NOSPEED);
-    else if(C3 || (C2 && C3) || (C2 && C3 && C4)){
+    else if(C3){
         moteur.changeSpeed(NOSPEED, NOSPEED);
-        current = FollowLine;
+        current = CouloirAMur;
     }
     else
         moteur.changeSpeed(AVGSPEED, AVGSPEED);
@@ -290,13 +338,11 @@ void turnSequence(const char direction){
             }
         }
         turnLeft = false;
-        // leftTurnCounter--;
     }
-    else {              //Si pas R ou L 
+    else {              //Si le input de l'utilisateur n'est pas L ou R. 
         return;
     }
 }
-
 
 void sonarSendPulse(){
     PORTA |= _BV(PA6);   
@@ -320,49 +366,41 @@ void sonarDetect(){
     sonarReadOutput();
     _delay_ms(50);
     uart.transmissionUART(distance);
-    if(distance >=10  && distance <= 20){
+    if(distance >=12  && distance <= 18){
         moteur.changeSpeed(AVGSPEED, AVGSPEED);
     }
-    else if(distance < 10){
+    else if(distance < 12){
         moteur.changeSpeed(AVGSPEED,0);
     }
-    else if(distance > 20){
+    else if(distance > 18){
         moteur.changeSpeed(0, AVGSPEED);
     }
-    
-    // else if(distance > 14){
-    //     moteur.changeSpeed(AVGSPEED, NOSPEED);
-    // }
-    // else if(distance < 16){  
-    //     moteur.changeSpeed(AVGSPEED, NOSPEED);
-    // }
-
 }
-
 
 void loopFollowLine(){
     del.rouge();
     if((C1 && C2 && C3) || (C2 && C3) || (C1 && C2 && C3 && C4) || (C2 && C3 && C4)){
-        _delay_ms(300);
+        _delay_ms(300); //Necessary delay for debounce
         if((C1 && C2 && C3) || (C2 && C3) || (C1 && C2 && C3 && C4) || (C2 && C3 && C4))
             loopSequenceCounter++;
     }
-    else if(C3 || (C2 && C3 && C4)){                            //X X 1 X X 
+    else if(C3 || (C2 && C3 && C4)){                            
         moteur.changeSpeed(AVGSPEED, AVGSPEED);
     }
     else if(C4){
         moteur.changeSpeed(LOWERAVGSPEED, NOSPEED);
     }
-    else if((C4 && C5) || C5){        //X X X 1 1 OU X X X 1 X OU X X X X 1
+    else if((C4 && C5) || C5){        
         moteur.changeSpeed(AVGSPEED, NOSPEED);
     }
-    else if(C1 || C2){                      // 1 X X X X OU 1 1 X X X 
+    else if(C1 || C2){                     
         moteur.changeSpeed(NOSPEED, AVGSPEED);
     }
     else if(!C1 && !C2 && !C3 && !C4 && !C5){
         moteur.changeSpeed(NOSPEED, NOSPEED);
     }
 }
+
 void bigLoopSequence(){
     del.vert();
     if(C1 && C2 && C3 && C4 && C5 || (C2 && C2 && C3 && C4)){
@@ -424,7 +462,7 @@ void smallLoopSequence(){
 
 void endingLoopSequence(){
     if((C1 && C2 && C3) || (C2 && C3) || (C1 && C2 && C3 && C4) || (C2 && C3 && C4)){
-        _delay_ms(300);
+        _delay_ms(300);     //Necessary delay for debounce
         if((C1 && C2 && C3) || (C2 && C3) || (C1 && C2 && C3 && C4) || (C2 && C3 && C4))
             endingLoopSequenceCounter++;
     }
@@ -448,6 +486,9 @@ void endingLoopSequence(){
     }
 }
 
+///////////////////////////////////////////////////////////////////////////////
+//Fonctions pour faire fonctionner le LCD Display.
+//Nous n'avons pas ecrite ses fonctions, elles sont copiees avec liscence de redistribution.
 /**
  * Fonction pour d�mo - banni�re de texte.
  * @param lcm		R�f�rence vers un LCM
@@ -484,7 +525,6 @@ static void banner(LCM& lcm, char* text, uint16_t ms_interval) {
 	lcm.clear();
 	cp_wait_ms(ms_interval);
 }
-
 /**
  * Fonction pour d�mo - vague.
  *
@@ -540,3 +580,4 @@ static void wave(LCM& lcm, uint16_t rep, uint16_t ms_interval) {
 	
 	lcm.clear();
 }
+///////////////////////////////////////////////////////////////////////////////
