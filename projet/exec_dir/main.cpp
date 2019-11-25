@@ -141,7 +141,7 @@ int main(){
                 if(C1 && C2 && C3){
                     stopSequence();
                     turnSequence('l');
-                    FollowLine();
+                    followLine();
                 }
                 else{
                     dontFollowLine();
