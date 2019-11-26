@@ -78,6 +78,13 @@ bool loopFL = false;
 uint8_t loopSequenceCounter = 0;
 uint8_t endingLoopSequenceCounter = 0;
 
+//Variables pour la section des coupures:
+uint8_t coupuresCounter = 0;
+uint8_t firstCoupure = 1;
+uint8_t secondCoupure;
+uint8_t thirdCoupure;
+uint8_t lastCoupure;
+
 
 ///////////////////////////////////////////////////////////////
 //Definition des fonctions
