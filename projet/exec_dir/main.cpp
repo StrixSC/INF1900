@@ -26,11 +26,13 @@ Fichiers utilisés: Uart.h, includes.h, memoire_24.h, del.h, enums.h, moteur.h
 #define DEMO_DDR	DDRC // `Data Direction Register' AVR occup� par l'aff.
 #define DEMO_PORT	PORTC // Port AVR occup� par l'afficheur
 
-#define AVGSPEED 60
+#define AVGSPEED 50
 #define LOWERAVGSPEED 40
 #define NOSPEED 0
 #define LOWSPEED 30
 #define HIGHSPEED 60
+#define HIGHERSPEED 90
+#define MAXSPEED 100
 #define ONE_SECOND 1000
 #define HALF_SECOND 500
 
@@ -43,6 +45,7 @@ UART uart;
 Del del;
 Moteur moteur;
 Piezo piezo;
+
 enum CurrentSection {Test, FollowLine, 
                     Couloir, CouloirAMur, 
                     Mur, MurABoucles, 
@@ -57,6 +60,8 @@ bool C3;
 bool C4;
 bool C5;
 
+bool couloirAMurBool = false;
+bool suivreLigne = true;
 //Variables pour la section du Mur
 volatile uint8_t distance;
 
@@ -110,9 +115,8 @@ int main(){
     DDRD = 0xF0; 
     moteur.startEngine();
 
-    current = Test;                 
-    disp.write("https://TheStrix.ca");
-    w();
+    current = Boucles;                 
+    disp.clear();
     while(true){
         switch(current){
             case Test:
@@ -138,19 +142,21 @@ int main(){
 
             case Couloir:
                 detect();
-                if(C1 && C2 && C3){
-                    stopSequence();
-                    turnSequence('l');
-                    followLine();
-                }
-                else{
-                    dontFollowLine();
-                }
+                dontFollowLine();
             break;
 
             case CouloirAMur:
-                if(!C1 && !C2 && !C3 && !C4 && !C5){
+                detect();
+                if(C1 && C2 && C3){
+                    stopSequence();
+                    turnSequence('l');
+                    couloirAMurBool = true;
+                }
+                else if((!C1 && !C2 && !C3 && !C4 && !C5) && couloirAMurBool){
                     current = Mur;
+                }
+                else{
+                    followLine();
                 }
             break;
 
@@ -266,9 +272,6 @@ void followLine(){
     else if(C3 && C4 && C5 || (C2 && C3 && C4 && C5)){                 
         turnRight = true;
     }
-    else if(!C1 && !C2 && !C3 && !C4 && !C5){                                  
-        moteur.changeSpeed(NOSPEED, NOSPEED);
-    }
     else if(C3 || (C2 && C3 && C4)){         
         moteur.changeSpeed(AVGSPEED, AVGSPEED);
     }
@@ -287,16 +290,22 @@ void followLine(){
 }
 
 void dontFollowLine(){
-    if(C5 || (C4 && C5))                                
-        moteur.changeSpeed(NOSPEED, AVGSPEED);
-    else if(C1 || C2 || (C1 && C2))                           
-        moteur.changeSpeed(AVGSPEED, NOSPEED);
-    else if(C3){
+    detect();
+    if(C3 || (C2 && C3) || (C3 && C4) || (C2 && C3 && C4)){
         moteur.changeSpeed(NOSPEED, NOSPEED);
-        current = CouloirAMur;
+        _delay_ms(ONE_SECOND);
+        current=CouloirAMur;
+    }
+    else if(C5 || (C4 && C5)){                           
+        moteur.changeSpeed(NOSPEED, MAXSPEED);
+        _delay_ms(100);
+    }
+    else if(C1 || (C1 && C2)){                           
+        moteur.changeSpeed(MAXSPEED, NOSPEED);
+        _delay_ms(50);
     }
     else
-        moteur.changeSpeed(AVGSPEED, AVGSPEED);
+        moteur.changeSpeed(HIGHSPEED, LOWERAVGSPEED);
 }
 
 void stopSequence(){
@@ -334,7 +343,7 @@ void turnSequence(const char direction){
                 turnBool = false;
             }
             else{
-                moteur.turnLeft(LOWERAVGSPEED);
+                moteur.turnLeft(AVGSPEED);
             }
         }
         turnLeft = false;
@@ -370,10 +379,10 @@ void sonarDetect(){
         moteur.changeSpeed(AVGSPEED, AVGSPEED);
     }
     else if(distance < 12){
-        moteur.changeSpeed(AVGSPEED,0);
+        moteur.changeSpeed(LOWERAVGSPEED,0);
     }
     else if(distance > 18){
-        moteur.changeSpeed(0, AVGSPEED);
+        moteur.changeSpeed(0, LOWERAVGSPEED);
     }
 }
 
