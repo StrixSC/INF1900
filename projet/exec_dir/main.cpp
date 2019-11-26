@@ -498,6 +498,59 @@ void endingLoopSequence(){
     }
 }
 
+
+void coupure(){
+    
+    // if(C1==true || C2==true || C3==true || C4==true || C5==true){
+    //     followLine();
+    // }
+    // /*else if(!C2 && !C3 && !C4){
+    //     moteur.changeSpeed(AVGSPEED, NOSPEED);
+    // }*/
+    // else if(!C1 && !C2 && !C3 && !C4 && !C5){
+    //     moteur.changeSpeed(AVGSPEED, NOSPEED);
+    // }
+
+    detect();
+    while(C1 || C2 || C3 || C4 || C5){
+        detect();
+        followLine();
+    }
+
+    if(coupuresCounter == 4){
+        moteur.changeSpeed(NOSPEED, NOSPEED);
+        current = CoupuresACouloir;
+    }
+    else if((!C1 && !C2 && !C3 && !C4 && !C5) && firstCoupure && !secondCoupure && !thirdCoupure && !lastCoupure){
+        moteur.changeSpeed(HIGHERSPEED, NOSPEED);
+        _delay_ms(100); //Changez ce delay pour faire les coupures.
+        firstCoupure = 0;
+        secondCoupure = 1;
+        coupuresCounter++;
+    }
+    else if((!C1 && !C2 && !C3 && !C4 && !C5) && !firstCoupure && secondCoupure && !thirdCoupure && !lastCoupure){
+        moteur.changeSpeed(NOSPEED, HIGHERSPEED);
+        _delay_ms(100);//Changez ce delay pour faire les coupures.
+        secondCoupure = 0;
+        thirdCoupure = 1;
+        coupuresCounter++;
+    }
+    else if(!C1 && !C2 && !C3 && !C4 && !C5 && !firstCoupure && !secondCoupure && thirdCoupure && !lastCoupure){
+        moteur.changeSpeed(HIGHERSPEED, NOSPEED);
+        _delay_ms(100); //Changez ce delay pour faire les coupures.
+        thirdCoupure = 0;
+        lastCoupure = 1;
+        coupuresCounter++;
+    }
+    else if(!C1 && !C2 && !C3 && !C4 && !C5 && !firstCoupure && !secondCoupure && !thirdCoupure && lastCoupure){
+        moteur.changeSpeed(NOSPEED, HIGHERSPEED);
+        _delay_ms(100); //Changez ce delay pour faire les coupures.
+        lastCoupure = 0;
+        coupuresCounter++;
+    }
+
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 //Fonctions pour faire fonctionner le LCD Display.
 //Nous n'avons pas ecrite ses fonctions, elles sont copiees avec liscence de redistribution.
@@ -592,17 +645,4 @@ static void wave(LCM& lcm, uint16_t rep, uint16_t ms_interval) {
 	
 	lcm.clear();
 }
-
-void coupure(){
-    if(C1==true || C2==true || C3==true || C4==true || C5==true){
-        followLine();
-    }
-    /*else if(!C2 && !C3 && !C4){
-        moteur.changeSpeed(AVGSPEED, NOSPEED);
-    }*/
-    else if(!C1 && !C2 && !C3 && !C4 && !C5){
-        moteur.changeSpeed(AVGSPEED, NOSPEED);
-    }
-}
-    
 ///////////////////////////////////////////////////////////////////////////////
