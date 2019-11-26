@@ -99,6 +99,7 @@ void smallLoopSequence();
 void bigLoopSequence();
 void loopFollowLine();
 void endingLoopSequence();
+void coupure();
 ///////////////////////////////////////////////////////
 ///////////                                 ///////////
 ///////////               MAIN              ///////////
@@ -115,7 +116,7 @@ int main(){
     DDRD = 0xF0; 
     moteur.startEngine();
 
-    current = Boucles;                 
+    current = Coupures;                 
     disp.clear();
     while(true){
         switch(current){
@@ -205,6 +206,8 @@ int main(){
 
             case Coupures:
                 detect();
+                coupure();
+
             break;
 
             case CoupuresACouloir:
@@ -589,4 +592,17 @@ static void wave(LCM& lcm, uint16_t rep, uint16_t ms_interval) {
 	
 	lcm.clear();
 }
+
+void coupure(){
+    if(C1==true || C2==true || C3==true || C4==true || C5==true){
+        followLine();
+    }
+    /*else if(!C2 && !C3 && !C4){
+        moteur.changeSpeed(AVGSPEED, NOSPEED);
+    }*/
+    else if(!C1 && !C2 && !C3 && !C4 && !C5){
+        moteur.changeSpeed(AVGSPEED, NOSPEED);
+    }
+}
+    
 ///////////////////////////////////////////////////////////////////////////////
