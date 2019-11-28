@@ -191,7 +191,7 @@ int main(){
                     detect();
                     bigLoopSequence();
                 }
-                stopSequence();
+                stopSequence();Couloir
                 turnSequence('l');
                 while(smallLoop){
                     detect();
