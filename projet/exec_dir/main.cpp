@@ -67,13 +67,18 @@ bool C5;
 bool couloirAMurBool = false;
 bool couloirBool = false;
 bool suivreLigne = true;
+
+//Booles pour le left-right bouncing du couloir.
+bool couloirLeanLeft = true;
+bool couloirLeanRight = false;
+
+//Variables pour la section du Mur
+volatile uint8_t distance;
+
+//Booles d'assemblage pour les sections Mur a Boucles.
 bool allowSwitch = false;
 bool allowSonar = false;
 bool allowFL = true;
-bool couloirLeanLeft = true;
-bool couloirLeanRight = false;
-//Variables pour la section du Mur
-volatile uint8_t distance;
 
 //Variables pour les turns Left && Right
 bool turnLeft = false;
@@ -143,7 +148,6 @@ int main(){
     // del.vert();
     current = Test;
     for(;;){}
-     /*                
     while(true){
         switch(current){
             case Test:
@@ -185,35 +189,7 @@ int main(){
             break;
 
             case Mur:
-                // while(C1 || C2 || C3 || C4 || C5){
-                //     detect();
-                //     followLine();
-                //     if(!C1 && !C2 && !C3 && !C4 && !C5){
-                //         break;
-                //     }
-                // }
-                // if(!beginFL){
-                //     if(C1 || C2 || C3 || C4 || C5){
-                //         detect();
-                //         beginFL = true;
-                //     }
-                //     detect();
-                //     sonarDetect();
-                // }  
-                // if(C1 || C2 || C3 || C4 || C5){
-                //     beginFL = true;
-                // }
-                // while(beginFL){
-                //     detect();
-                //     if(C1 && C2 && C3){
-                //         beginFL = false;
-                //         allowSwitch = true;
-                //     }
-                //     followLine();
-                // }
-                // if(C1 && C2 && C3 && allowSwitch){
-                //     turnSequence('l');
-                // }
+                //Necessaire pour passer de corridor a mur
                 while(allowFL){
                     detect();
                     followLine();
@@ -223,26 +199,32 @@ int main(){
                     }
                 }
 
+                //Des que le capteur ne capte plus rien, on assume que le mur est a la gauche du robot.
                 while(allowSonar){
                     detect();
-                    sonarDetect();
+                    sonarDetect(); 
+                    //Des que le capteur capte quelque chose, on passe termine le mur
                     if(C1 || C2 || C3 || C4 || C5){
                         allowFL = true;
                         allowSonar = false;
                     }
                 }
                 
+                //Necessaire pour remettre le robot sur la bonne voie
                 turnSequence('r');
 
+                //On permet ensuite de continuer le followline
                 while(allowFL){
                     detect();
-                    followLine();
+                    followLine();  
+                    //Si on capte 1,2,3 -> on termine follow-line
                     if(C1 && C2 && C3){
                         allowFL = false;
                         allowSwitch = true;
                     }
                 }
 
+                //On permet le switch de mur a boucles.
                 if(allowSwitch){
                     detect();
                     turnSequence('l');
@@ -329,7 +311,6 @@ int main(){
 
         }
     }
-*/
 }
 
 void initialisation ( void ) {
