@@ -5,8 +5,12 @@ Description: Ce fichier permet de faire passer au robot différents états pour 
 Fichiers utilisés: Uart.h, includes.h, memoire_24.h, del.h, enums.h, moteur.h
 
 **************************************************************************************************************************/
+
+#define F_CPU 8000000
+#include <avr/io.h>
+#include <util/delay.h>
+#include <avr/interrupt.h>
 #include "UART.h"
-#include "includes.h"
 #include "memoire_24.h"
 #include "del.h"
 #include "enums.h"
@@ -61,7 +65,13 @@ bool C4;
 bool C5;
 
 bool couloirAMurBool = false;
+bool couloirBool = false;
 bool suivreLigne = true;
+bool allowSwitch = false;
+bool allowSonar = false;
+bool allowFL = true;
+bool couloirLeanLeft = true;
+bool couloirLeanRight = false;
 //Variables pour la section du Mur
 volatile uint8_t distance;
 
@@ -74,9 +84,20 @@ uint8_t leftTurnCounter = 4;
 //Variables pour la section des boucles:
 bool bigLoop = false;
 bool smallLoop = false;
-bool loopFL = false;
+bool loopFL = true;
 uint8_t loopSequenceCounter = 0;
 uint8_t endingLoopSequenceCounter = 0;
+
+//Variables pour la section des coupures:
+uint8_t coupuresCounter = 0;
+uint8_t firstCoupure = 1;
+uint8_t secondCoupure;
+uint8_t thirdCoupure;
+uint8_t lastCoupure;
+bool coupureFL = true;
+//variable pour l'interface
+uint8_t sectionCounter = 0; 
+uint8_t whiteBtnClick = 0;
 
 
 ///////////////////////////////////////////////////////////////
@@ -86,6 +107,7 @@ void static inline w(void) {
 }
 static void banner(LCM&, char*, uint16_t);
 static void wave(LCM&, uint16_t, uint16_t);
+void initialisation();
 void seanceInit();
 void detect();
 void followLine();
@@ -99,6 +121,7 @@ void smallLoopSequence();
 void bigLoopSequence();
 void loopFollowLine();
 void endingLoopSequence();
+void coupure();
 ///////////////////////////////////////////////////////
 ///////////                                 ///////////
 ///////////               MAIN              ///////////
@@ -109,109 +132,243 @@ void endingLoopSequence();
 @param: void;
 @return: int;
 */
+
+
 int main(){
+    initialisation();
     DDRA |= _BV(PA6);
     DDRB = 0xFF; 
-    DDRD = 0xF0; 
+    DDRD = 0xF0;
     moteur.startEngine();
-
-    current = Boucles;                 
-    disp.clear();
+    // del.vert();
+    current = Test;
+    for(;;){}
+     /*                
     while(true){
         switch(current){
             case Test:
-                if(btn.click()){
+                if(btn.getClicked()){
                     del.vert();
                 }
-                else{
+                else if (btn.getClicked() == 0){
+                    del.eteindre();
+                }
+                else if(whiteBtnClick){
+                    del.vert();
+                }
+                else if(!whiteBtnClick){
                     del.eteindre();
                 }
             break;
 
-            case FollowLine:
-                //Turn sequence test. Do not delete please - Nawras
-                if(turnRight){
-                    turnSequence('r');
-                }
-                else if(turnLeft){
-                    turnSequence('l');
-                }
+            case Couloir:
                 detect();
+                if(C1 && C2 && C3){
+                    detect();
+                    turnSequence('l');
+                    current = Mur;
+                }
+                
+                if(!C1 && !C2 && !C3 && !C4 && !C5){
+                    couloirBool = true;
+                }
+
+                if(couloirBool){
+                    detect();
+                    dontFollowLine();
+                    if(C3){
+                        couloirBool = false;
+                    }
+                }
+
                 followLine();
             break;
 
-            case Couloir:
-                detect();
-                dontFollowLine();
+            case Mur:
+                // while(C1 || C2 || C3 || C4 || C5){
+                //     detect();
+                //     followLine();
+                //     if(!C1 && !C2 && !C3 && !C4 && !C5){
+                //         break;
+                //     }
+                // }
+                // if(!beginFL){
+                //     if(C1 || C2 || C3 || C4 || C5){
+                //         detect();
+                //         beginFL = true;
+                //     }
+                //     detect();
+                //     sonarDetect();
+                // }  
+                // if(C1 || C2 || C3 || C4 || C5){
+                //     beginFL = true;
+                // }
+                // while(beginFL){
+                //     detect();
+                //     if(C1 && C2 && C3){
+                //         beginFL = false;
+                //         allowSwitch = true;
+                //     }
+                //     followLine();
+                // }
+                // if(C1 && C2 && C3 && allowSwitch){
+                //     turnSequence('l');
+                // }
+                while(allowFL){
+                    detect();
+                    followLine();
+                    if(!C1 && !C2 && !C3 && !C4 && !C5){
+                        allowFL = false;
+                        allowSonar = true;
+                    }
+                }
+
+                while(allowSonar){
+                    detect();
+                    sonarDetect();
+                    if(C1 || C2 || C3 || C4 || C5){
+                        allowFL = true;
+                        allowSonar = false;
+                    }
+                }
+                
+                turnSequence('r');
+
+                while(allowFL){
+                    detect();
+                    followLine();
+                    if(C1 && C2 && C3){
+                        allowFL = false;
+                        allowSwitch = true;
+                    }
+                }
+
+                if(allowSwitch){
+                    detect();
+                    turnSequence('l');
+                    current = Boucles;
+                }
+
             break;
 
-            case CouloirAMur:
-                detect();
-                if(C1 && C2 && C3){
-                    stopSequence();
-                    turnSequence('l');
-                    couloirAMurBool = true;
+            case Boucles:
+                while(loopFL){
+                    detect();
+                    if(loopSequenceCounter >= 3){
+                        loopFL = false;
+                        bigLoop = true;
+                        loopSequenceCounter = 0;
+                    }
+                    else if(C1 && C2 && C3 && C4 && C5){
+                        followLine();
+                    }
+                    else if(C1 && C2 && C3 || (C1 && C2 && C3 && C4)){
+                        loopSequenceCounter++;
+                        _delay_ms(300);
+                    }
+                    else
+                        followLine();
                 }
-                else if((!C1 && !C2 && !C3 && !C4 && !C5) && couloirAMurBool){
-                    current = Mur;
+
+                turnSequence('l');
+
+                while(bigLoop){
+                    detect();
+                    if(C1 && C2 && C3){
+                        loopSequenceCounter++;
+                        _delay_ms(300);
+                        turnSequence('l');
+                    }
+                    else if(loopSequenceCounter >= 4){
+                        bigLoop = false;
+                        smallLoop = true;
+                        loopSequenceCounter = 0;
+                    }
+                    else
+                        followLine();
+                }
+
+                turnSequence('l');
+
+                while(smallLoop){
+                    detect();
+                    if(C1 && C2 && C3){
+                        loopSequenceCounter++;
+                        _delay_ms(300);
+                        turnSequence('l');
+                    }
+                    else if(loopSequenceCounter >= 4){
+                        smallLoop = false;
+                        loopSequenceCounter = 0;
+                    }
+                    else
+                        followLine();
+                }
+
+                turnSequence('l');
+                if(C1 && C2 && C3){
+                    turnSequence('l');
+                    current = Coupures;
                 }
                 else{
                     followLine();
                 }
-            break;
 
-            case Mur:  
-                if(C1 || C2 || C3 || C4 || C5){
-                    current = MurABoucles;
-                }
-                else{
-                    sonarDetect();
-                }
-            break;
-
-            case MurABoucles:
-                detect();
-            break;
-
-            case Boucles:
-                loopFL = true;
-                while(loopFL){
-                    detect();
-                    loopFollowLine();
-                    if(loopSequenceCounter == 3){
-                        loopSequenceCounter = 0;
-                        loopFL = false;
-                        bigLoop = true;
-                    }
-                }
-                stopSequence();
-                _delay_ms(100);
-                turnSequence('l');
-                while(bigLoop){
-                    detect();
-                    bigLoopSequence();
-                }
-                stopSequence();Couloir
-                turnSequence('l');
-                while(smallLoop){
-                    detect();
-                    smallLoopSequence();
-                }
-            break;
-
-            case BouclesACoupures:
-                detect();
             break;
 
             case Coupures:
                 detect();
+                if(C1 && C2 && C3){
+                    turnSequence('l');
+                    current = Couloir;
+                }
+                else{
+                    coupure();
+                }
             break;
 
-            case CoupuresACouloir:
-                detect();
-            break;
         }
     }
+*/
+}
+
+void initialisation ( void ) {
+  cli ();
+  EIMSK |= (1 << INT0) | (1 << INT1);
+
+  EICRA |= (1 << ISC00) | (1 << ISC11); 
+  sei ();
+}
+
+// ISR(INT0_vect){
+//     _delay_ms(30);
+//     if(PIND & 0x04){
+//         _delay_ms(50);
+//         if(PIND & 0x04){
+//             btn.setClicked(1);
+//         }
+//     }
+//     else{
+//         btn.setClicked(0);
+//     }
+// }
+
+ISR(INT1_vect){
+    _delay_ms(30);
+    
+    if(   !(PIND & (1 << PD3))   ){
+        whiteBtnClick = 1;
+            del.vert();
+        // _delay_ms(30);
+        // if(   !(PIND & (1<< PD3))   ){
+            
+        // }
+    }else {
+        whiteBtnClick = 0;
+        del.rouge();
+    }
+
+    EIFR |= (1 << INTF1);
 }
 /*
 @Brief: Cette fonction ne sert qu'a faire clignoter la del en rouge 2 fois et 
@@ -244,6 +401,7 @@ void detect(){
         C1 = true;
     else if(!(PINA & CAPTEUR1))
         C1 = false;
+        
     if(PINA & CAPTEUR2)
         C2 = true;
     else if(!(PINA & CAPTEUR2))
@@ -266,20 +424,14 @@ void detect(){
 }
 
 void followLine(){
-    if(C1 && C2 && C3 || (C1 && C2 && C3 && C4)){                     
-        turnLeft = true;
-    }
-    else if(C3 && C4 && C5 || (C2 && C3 && C4 && C5)){                 
-        turnRight = true;
-    }
-    else if(C3 || (C2 && C3 && C4)){         
+    if(C3 || (C2 && C3 && C4)){         
         moteur.changeSpeed(AVGSPEED, AVGSPEED);
     }
     else if(C2 || (C1 && C2)){              
-        moteur.changeSpeed(NOSPEED, AVGSPEED);
+        moteur.changeSpeed(LOWERAVGSPEED, AVGSPEED);
     }
     else if(C4 || (C4 && C5)){              
-        moteur.changeSpeed(AVGSPEED, NOSPEED);
+        moteur.changeSpeed(AVGSPEED, LOWERAVGSPEED);
     }
     else if(C1){                            
         moteur.changeSpeed(NOSPEED, AVGSPEED);
@@ -291,21 +443,21 @@ void followLine(){
 
 void dontFollowLine(){
     detect();
-    if(C3 || (C2 && C3) || (C3 && C4) || (C2 && C3 && C4)){
-        moteur.changeSpeed(NOSPEED, NOSPEED);
-        _delay_ms(ONE_SECOND);
-        current=CouloirAMur;
+    if(C5 || (C4 && C5)){        
+        couloirLeanRight = false;
+        couloirLeanLeft = true;
     }
-    else if(C5 || (C4 && C5)){                           
-        moteur.changeSpeed(NOSPEED, MAXSPEED);
-        _delay_ms(100);
+    else if(C1 || (C1 && C2)){
+        couloirLeanLeft = false;
+        couloirLeanRight = true;
     }
-    else if(C1 || (C1 && C2)){                           
-        moteur.changeSpeed(MAXSPEED, NOSPEED);
-        _delay_ms(50);
+    
+    if(couloirLeanLeft){
+        moteur.changeSpeed(NOSPEED, 60);
     }
-    else
-        moteur.changeSpeed(HIGHSPEED, LOWERAVGSPEED);
+    else if(couloirLeanRight){
+        moteur.changeSpeed(60, NOSPEED);
+    }
 }
 
 void stopSequence(){
@@ -322,12 +474,12 @@ void turnSequence(const char direction){
         while(turnBool){
             detect();
             if(C3 || C4 || C5){
-                del.rouge();
+                del.vert();
                 turnBool = false;
             }
             else{
-                del.vert();
-                moteur.turnRight(LOWERAVGSPEED);
+                del.rouge();
+                moteur.turnRight(AVGSPEED);
             }
         }
         turnRight = false;
@@ -388,21 +540,24 @@ void sonarDetect(){
 
 void loopFollowLine(){
     del.rouge();
-    if((C1 && C2 && C3) || (C2 && C3) || (C1 && C2 && C3 && C4) || (C2 && C3 && C4)){
+    if((C1 && C2 && C3) || (C1 && C2 && C3 && C4)){
         _delay_ms(300); //Necessary delay for debounce
-        if((C1 && C2 && C3) || (C2 && C3) || (C1 && C2 && C3 && C4) || (C2 && C3 && C4))
+        if((C1 && C2 && C3) || (C1 && C2 && C3 && C4))
             loopSequenceCounter++;
     }
     else if(C3 || (C2 && C3 && C4)){                            
         moteur.changeSpeed(AVGSPEED, AVGSPEED);
     }
     else if(C4){
-        moteur.changeSpeed(LOWERAVGSPEED, NOSPEED);
+        moteur.changeSpeed(AVGSPEED, NOSPEED);
     }
     else if((C4 && C5) || C5){        
         moteur.changeSpeed(AVGSPEED, NOSPEED);
     }
-    else if(C1 || C2){                     
+    else if(C1 || (C1 && C2)){                     
+        moteur.changeSpeed(NOSPEED, AVGSPEED);
+    }
+    else if(C2){
         moteur.changeSpeed(NOSPEED, AVGSPEED);
     }
     else if(!C1 && !C2 && !C3 && !C4 && !C5){
@@ -411,8 +566,9 @@ void loopFollowLine(){
 }
 
 void bigLoopSequence(){
+    detect();
     del.vert();
-    if(C1 && C2 && C3 && C4 && C5 || (C2 && C2 && C3 && C4)){
+    if(C1 && C2 && C3 || (C1 && C2 && C3 && C4)){
         bigLoop = false;
         smallLoop = true;
     }
@@ -493,6 +649,58 @@ void endingLoopSequence(){
     else if(!C1 && !C2 && !C3 && !C4 && !C5){
         moteur.changeSpeed(NOSPEED, NOSPEED);
     }
+}
+
+
+void coupure(){
+    
+    detect();
+    
+    if(C1 || C2 || C3 || C4 || C5)
+        coupureFL = true;
+    else
+        coupureFL = false;
+
+    if(coupureFL)
+        followLine();
+    else{
+        if(coupuresCounter == 4){
+            moteur.changeSpeed(NOSPEED, NOSPEED);
+        }
+        else if((!C1 && !C2 && !C3 && !C4 && !C5) && firstCoupure && !secondCoupure && !thirdCoupure && !lastCoupure){
+            moteur.changeSpeed(HIGHERSPEED, NOSPEED);
+            _delay_ms(400); //Changez ce delay pour faire les coupures.
+            firstCoupure = 0;
+            secondCoupure = 1;
+            coupuresCounter++;
+            _delay_ms(50);  //Debounce
+        }
+        else if((!C1 && !C2 && !C3 && !C4 && !C5) && !firstCoupure && secondCoupure && !thirdCoupure && !lastCoupure){
+            moteur.changeSpeed(NOSPEED, HIGHERSPEED);
+            _delay_ms(400);//Changez ce delay pour faire les coupures.
+            secondCoupure = 0;
+            thirdCoupure = 1;
+            coupuresCounter++;
+            _delay_ms(50);  //Debounce
+        }
+        else if(!C1 && !C2 && !C3 && !C4 && !C5 && !firstCoupure && !secondCoupure && thirdCoupure && !lastCoupure){
+            moteur.changeSpeed(HIGHERSPEED, NOSPEED);
+            _delay_ms(400); //Changez ce delay pour faire les coupures.
+            thirdCoupure = 0;
+            lastCoupure = 1;
+            coupuresCounter++;
+            _delay_ms(50);  //Debounce
+        }
+        else if(!C1 && !C2 && !C3 && !C4 && !C5 && !firstCoupure && !secondCoupure && !thirdCoupure && lastCoupure){
+            moteur.changeSpeed(NOSPEED, HIGHERSPEED);
+            _delay_ms(400); //Changez ce delay pour faire les coupures.
+            lastCoupure = 0;
+            coupuresCounter++;
+            _delay_ms(50);  //Debounce
+        }
+    }
+
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////
