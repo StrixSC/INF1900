@@ -148,7 +148,7 @@ int main(void) {
 	disp.clear();
 	for (uint8_t i = 0; i < LCM_FW_TOT_CH; ++i) {
 		for (char c = 0x21; c <= 0xdf; ++c) {
-			disp.put(c);
+			disp.write();
 			disp -= 1;
 		}
 		disp.put(0xff);

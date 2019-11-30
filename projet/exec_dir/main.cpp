@@ -95,11 +95,15 @@ uint8_t endingLoopSequenceCounter = 0;
 
 //Variables pour la section des coupures:
 uint8_t coupuresCounter = 0;
-uint8_t firstCoupure = 1;
-uint8_t secondCoupure;
-uint8_t thirdCoupure;
-uint8_t lastCoupure;
-bool coupureFL = true;
+bool followLineCoupure = true;
+bool firstCoupure = true;
+bool secondCoupure = false;
+bool thirdCoupure = false;
+bool lastCoupure = false;
+bool coupures = true;
+
+bool coupureTurnRight = true;
+bool coupureTurnLeft = false;
 //variable pour l'interface
 uint8_t sectionCounter = 0; 
 uint8_t whiteBtnClick = 0;
@@ -127,6 +131,7 @@ void bigLoopSequence();
 void loopFollowLine();
 void endingLoopSequence();
 void coupure();
+void boucles();
 ///////////////////////////////////////////////////////
 ///////////                                 ///////////
 ///////////               MAIN              ///////////
@@ -145,19 +150,11 @@ int main(){
     DDRB = 0xFF; 
     DDRD = 0xF0;
     moteur.startEngine();
-    // del.vert();
-    current = Test;
-    for(;;){}
+    current = Boucles;
     while(true){
         switch(current){
             case Test:
-                if(btn.getClicked()){
-                    del.vert();
-                }
-                else if (btn.getClicked() == 0){
-                    del.eteindre();
-                }
-                else if(whiteBtnClick){
+                if(whiteBtnClick){
                     del.vert();
                 }
                 else if(!whiteBtnClick){
@@ -172,7 +169,7 @@ int main(){
                     turnSequence('l');
                     current = Mur;
                 }
-                
+
                 if(!C1 && !C2 && !C3 && !C4 && !C5){
                     couloirBool = true;
                 }
@@ -209,7 +206,7 @@ int main(){
                         allowSonar = false;
                     }
                 }
-                
+
                 //Necessaire pour remettre le robot sur la bonne voie
                 turnSequence('r');
 
@@ -234,81 +231,20 @@ int main(){
             break;
 
             case Boucles:
-                while(loopFL){
-                    detect();
-                    if(loopSequenceCounter >= 3){
-                        loopFL = false;
-                        bigLoop = true;
-                        loopSequenceCounter = 0;
-                    }
-                    else if(C1 && C2 && C3 && C4 && C5){
-                        followLine();
-                    }
-                    else if(C1 && C2 && C3 || (C1 && C2 && C3 && C4)){
-                        loopSequenceCounter++;
-                        _delay_ms(300);
-                    }
-                    else
-                        followLine();
-                }
-
-                turnSequence('l');
-
-                while(bigLoop){
-                    detect();
-                    if(C1 && C2 && C3){
-                        loopSequenceCounter++;
-                        _delay_ms(300);
-                        turnSequence('l');
-                    }
-                    else if(loopSequenceCounter >= 4){
-                        bigLoop = false;
-                        smallLoop = true;
-                        loopSequenceCounter = 0;
-                    }
-                    else
-                        followLine();
-                }
-
-                turnSequence('l');
-
-                while(smallLoop){
-                    detect();
-                    if(C1 && C2 && C3){
-                        loopSequenceCounter++;
-                        _delay_ms(300);
-                        turnSequence('l');
-                    }
-                    else if(loopSequenceCounter >= 4){
-                        smallLoop = false;
-                        loopSequenceCounter = 0;
-                    }
-                    else
-                        followLine();
-                }
-
-                turnSequence('l');
-                if(C1 && C2 && C3){
-                    turnSequence('l');
-                    current = Coupures;
-                }
-                else{
-                    followLine();
-                }
-
+                detect();
+                boucles();
+                del.ambre();
             break;
 
             case Coupures:
                 detect();
-                if(C1 && C2 && C3){
-                    turnSequence('l');
-                    current = Couloir;
-                }
-                else{
+                if(!coupures){
                     coupure();
                 }
+                else{
+                    followLine();
+                }
             break;
-
         }
     }
 }
@@ -321,34 +257,28 @@ void initialisation ( void ) {
   sei ();
 }
 
-// ISR(INT0_vect){
-//     _delay_ms(30);
-//     if(PIND & 0x04){
-//         _delay_ms(50);
-//         if(PIND & 0x04){
-//             btn.setClicked(1);
-//         }
-//     }
-//     else{
-//         btn.setClicked(0);
-//     }
-// }
+ISR(INT0_vect){
+    _delay_ms(30);
+    if(PIND & 0x04){
+        _delay_ms(50);
+        if(PIND & 0x04){
+            btn.setClicked(1);
+        }
+    }
+    else{
+        btn.setClicked(0);
+    }
+}
 
 ISR(INT1_vect){
     _delay_ms(30);
     
-    if(   !(PIND & (1 << PD3))   ){
+    if(!(PIND & (1 << PD3))){
         whiteBtnClick = 1;
-            del.vert();
-        // _delay_ms(30);
-        // if(   !(PIND & (1<< PD3))   ){
-            
-        // }
-    }else {
-        whiteBtnClick = 0;
-        del.rouge();
     }
-
+    else {
+        whiteBtnClick = 0;
+    }
     EIFR |= (1 << INTF1);
 }
 /*
@@ -434,10 +364,10 @@ void dontFollowLine(){
     }
     
     if(couloirLeanLeft){
-        moteur.changeSpeed(NOSPEED, 60);
+        moteur.changeSpeed(NOSPEED, AVGSPEED);
     }
     else if(couloirLeanRight){
-        moteur.changeSpeed(60, NOSPEED);
+        moteur.changeSpeed(AVGSPEED, NOSPEED);
     }
 }
 
@@ -450,12 +380,10 @@ void stopSequence(){
 
 void turnSequence(const char direction){
     if(direction == 'r'){
-        stopSequence();
         uint8_t turnBool = 1;
         while(turnBool){
             detect();
             if(C3 || C4 || C5){
-                del.vert();
                 turnBool = false;
             }
             else{
@@ -467,15 +395,14 @@ void turnSequence(const char direction){
         // rightTurnCounter--;
     }
     else if(direction == 'l'){
-        stopSequence();
         uint8_t turnBool = 1;
         while(turnBool){
             detect();
             if(C1 || C2 || C3){
-                del.rouge();
                 turnBool = false;
             }
             else{
+                del.vert();
                 moteur.turnLeft(AVGSPEED);
             }
         }
@@ -484,6 +411,21 @@ void turnSequence(const char direction){
     else {              //Si le input de l'utilisateur n'est pas L ou R. 
         return;
     }
+}
+
+void sharpTurnLeft(){
+    uint8_t turnBool = 1;
+        while(turnBool){
+            detect();
+            if(C3){
+                turnBool = false;
+            }
+            else{
+                del.vert();
+                moteur.turnLeft(AVGSPEED);
+            }
+        }
+        turnLeft = false;
 }
 
 void sonarSendPulse(){
@@ -508,13 +450,13 @@ void sonarDetect(){
     sonarReadOutput();
     _delay_ms(50);
     uart.transmissionUART(distance);
-    if(distance >=12  && distance <= 18){
+    if(distance >=13  && distance <= 17){
         moteur.changeSpeed(AVGSPEED, AVGSPEED);
     }
-    else if(distance < 12){
+    else if(distance < 13){
         moteur.changeSpeed(LOWERAVGSPEED,0);
     }
-    else if(distance > 18){
+    else if(distance > 17){
         moteur.changeSpeed(0, LOWERAVGSPEED);
     }
 }
@@ -554,7 +496,6 @@ void bigLoopSequence(){
         smallLoop = true;
     }
     else if((C1 && C2 && C3) || (C2 && C3) || (C4 && C3 && C2 && C1)){
-        stopSequence();
         turnSequence('l');
     }
     else if(C1){
@@ -583,7 +524,6 @@ void smallLoopSequence(){
         smallLoop = false;
     }
     else if(C1 && C2 && C3 || C2 && C3){
-        stopSequence();
         turnSequence('l');
     }
     else if(C3 || (C2 && C3 && C4)){
@@ -632,59 +572,119 @@ void endingLoopSequence(){
     }
 }
 
+bool nextCoupure = false;
 
-void coupure(){
-    
-    detect();
-    
-    if(C1 || C2 || C3 || C4 || C5)
-        coupureFL = true;
-    else
-        coupureFL = false;
-
-    if(coupureFL)
+bool avancerTillNextCoupures(){
+    while(nextCoupure){
+        detect();
         followLine();
-    else{
-        if(coupuresCounter == 4){
-            moteur.changeSpeed(NOSPEED, NOSPEED);
+        if(!C1 && !C2 && !C3 && !C4 && !C5){
+            _delay_ms(200);
+            detect();
+            if(!C1 && !C2 && !C3 && !C4 && !C5){
+                nextCoupure = false;
+                return false;
+            }
         }
-        else if((!C1 && !C2 && !C3 && !C4 && !C5) && firstCoupure && !secondCoupure && !thirdCoupure && !lastCoupure){
-            moteur.changeSpeed(HIGHERSPEED, NOSPEED);
-            _delay_ms(400); //Changez ce delay pour faire les coupures.
-            firstCoupure = 0;
-            secondCoupure = 1;
-            coupuresCounter++;
-            _delay_ms(50);  //Debounce
-        }
-        else if((!C1 && !C2 && !C3 && !C4 && !C5) && !firstCoupure && secondCoupure && !thirdCoupure && !lastCoupure){
-            moteur.changeSpeed(NOSPEED, HIGHERSPEED);
-            _delay_ms(400);//Changez ce delay pour faire les coupures.
-            secondCoupure = 0;
-            thirdCoupure = 1;
-            coupuresCounter++;
-            _delay_ms(50);  //Debounce
-        }
-        else if(!C1 && !C2 && !C3 && !C4 && !C5 && !firstCoupure && !secondCoupure && thirdCoupure && !lastCoupure){
-            moteur.changeSpeed(HIGHERSPEED, NOSPEED);
-            _delay_ms(400); //Changez ce delay pour faire les coupures.
-            thirdCoupure = 0;
-            lastCoupure = 1;
-            coupuresCounter++;
-            _delay_ms(50);  //Debounce
-        }
-        else if(!C1 && !C2 && !C3 && !C4 && !C5 && !firstCoupure && !secondCoupure && !thirdCoupure && lastCoupure){
-            moteur.changeSpeed(NOSPEED, HIGHERSPEED);
-            _delay_ms(400); //Changez ce delay pour faire les coupures.
-            lastCoupure = 0;
-            coupuresCounter++;
-            _delay_ms(50);  //Debounce
-        }
-    }
-
-
+    } 
 }
 
-///////////////////////////////////////////////////////////////////////////////
+void coupure(){
+    while(avancerTillNextCoupures()){};
+    detect();
+    moteur.changeSpeed(AVGSPEED, NOSPEED);
+    _delay_ms(ONE_SECOND);
+
+    while(avancerTillNextCoupures()){};
+    detect();
+    moteur.changeSpeed(NOSPEED, AVGSPEED);
+    _delay_ms(ONE_SECOND);
+
+    while(avancerTillNextCoupures()){};
+    detect();
+    moteur.changeSpeed(AVGSPEED, NOSPEED);
+    _delay_ms(ONE_SECOND);
+
+    while(avancerTillNextCoupures()){};
+    detect();
+    moteur.changeSpeed(NOSPEED, AVGSPEED);
+    _delay_ms(ONE_SECOND);
+}
+
+uint8_t bouclesCtr = 0;
+
+char boucles_ctr_char_converter(uint8_t num){
+    switch(num){
+        case 0: return '0';
+        case 1: return '1';
+        case 2: return '2';
+        case 3: return '3';
+        case 4: return '4';
+        case 5: return '5';
+        case 6: return '6';
+        case 7: return '7';
+        case 8: return '8';
+        case 9: return '9';
+        case 10: return '10';
+        case 11: return '11';
+        case 12: return '12';
+        case 13: return '13';
+    }
+}  
+
+void boucles(){
+    do{
+        detect(); 
+        followLine();
+        disp.clear();
+        disp.put(boucles_ctr_char_converter(bouclesCtr));
+        if(C1 && C2 && C3 || (C1 && C2 && C3 && C4)){
+            _delay_ms(200);
+            if(C1 && C2 && C3 || (C1 && C2 && C3 && C4)){
+                bouclesCtr++;
+                _delay_ms(300);     //MODIFIER
+            }
+        }
+        
+        if(bouclesCtr == 3){
+            del.vert();
+            detect();
+            turnSequence('l');
+        }
+        else if(bouclesCtr == 4){
+            detect();
+            turnSequence('l');
+        }
+        else if(bouclesCtr == 5){
+            detect();
+            turnSequence('l');
+        }
+        else if(bouclesCtr == 6){
+            del.rouge();
+            detect();
+            sharpTurnLeft();
+        }
+        else if(bouclesCtr == 7){
+            detect();
+            turnSequence('l');
+            del.rouge();
+        }
+        else if(bouclesCtr == 8){
+            detect();
+            turnSequence('l');
+        }
+        else if(bouclesCtr == 9){
+            detect();
+            turnSequence('l');
+        }
+        else if(bouclesCtr == 10){
+            detect();
+            turnSequence('l');
+        }
+    }
+    while(bouclesCtr <= 12);
+}
+//////////////////////////////z////////////////////////////////////////////////
 //Fonctions pour faire fonctionner le LCD Display.
 //Nous n'avons pas ecrite ses fonctions, elles sont copiees avec liscence de redistribution.
 /**
