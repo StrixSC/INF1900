@@ -92,6 +92,7 @@ bool smallLoop = false;
 bool loopFL = true;
 uint8_t loopSequenceCounter = 0;
 uint8_t endingLoopSequenceCounter = 0;
+uint8_t bouclesCtr = 0;
 
 //Variables pour la section des coupures:
 uint8_t coupuresCounter = 0;
@@ -132,6 +133,8 @@ void loopFollowLine();
 void endingLoopSequence();
 void coupure();
 void boucles();
+void sharpTurnLeft();
+
 ///////////////////////////////////////////////////////
 ///////////                                 ///////////
 ///////////               MAIN              ///////////
@@ -142,22 +145,20 @@ void boucles();
 @param: void;
 @return: int;
 */
-
-
 int main(){
     initialisation();
     DDRA |= _BV(PA6);
     DDRB = 0xFF; 
     DDRD = 0xF0;
     moteur.startEngine();
-    current = Boucles;
+    current = Test;
     while(true){
         switch(current){
             case Test:
                 if(whiteBtnClick){
                     del.vert();
                 }
-                else if(!whiteBtnClick){
+                else{
                     del.eteindre();
                 }
             break;
@@ -231,9 +232,19 @@ int main(){
             break;
 
             case Boucles:
+                do{
+                    detect();
+                    boucles();
+                }
+                while(bouclesCtr <= 12);
+
                 detect();
-                boucles();
-                del.ambre();
+                followLine();
+                if(C1 && C2 && C3){
+                    turnSequence('l');
+                    current = Coupures;
+                }
+
             break;
 
             case Coupures:
@@ -611,7 +622,7 @@ void coupure(){
     _delay_ms(ONE_SECOND);
 }
 
-uint8_t bouclesCtr = 0;
+// uint8_t bouclesCtr = 0;
 
 char boucles_ctr_char_converter(uint8_t num){
     switch(num){
@@ -633,56 +644,52 @@ char boucles_ctr_char_converter(uint8_t num){
 }  
 
 void boucles(){
-    do{
-        detect(); 
-        followLine();
-        disp.clear();
-        disp.put(boucles_ctr_char_converter(bouclesCtr));
+    detect(); 
+    followLine();
+    // disp.write(boucles_ctr_char_converter(bouclesCtr));
+    if(C1 && C2 && C3 || (C1 && C2 && C3 && C4)){
+        _delay_ms(200);
         if(C1 && C2 && C3 || (C1 && C2 && C3 && C4)){
-            _delay_ms(200);
-            if(C1 && C2 && C3 || (C1 && C2 && C3 && C4)){
-                bouclesCtr++;
-                _delay_ms(300);     //MODIFIER
-            }
-        }
-        
-        if(bouclesCtr == 3){
-            del.vert();
-            detect();
-            turnSequence('l');
-        }
-        else if(bouclesCtr == 4){
-            detect();
-            turnSequence('l');
-        }
-        else if(bouclesCtr == 5){
-            detect();
-            turnSequence('l');
-        }
-        else if(bouclesCtr == 6){
-            del.rouge();
-            detect();
-            sharpTurnLeft();
-        }
-        else if(bouclesCtr == 7){
-            detect();
-            turnSequence('l');
-            del.rouge();
-        }
-        else if(bouclesCtr == 8){
-            detect();
-            turnSequence('l');
-        }
-        else if(bouclesCtr == 9){
-            detect();
-            turnSequence('l');
-        }
-        else if(bouclesCtr == 10){
-            detect();
-            turnSequence('l');
+            bouclesCtr++;
+            _delay_ms(300);     //MODIFIER
         }
     }
-    while(bouclesCtr <= 12);
+    
+    if(bouclesCtr == 3){
+        del.vert();
+        detect();
+        turnSequence('l');
+    }
+    else if(bouclesCtr == 4){
+        detect();
+        turnSequence('l');
+    }
+    else if(bouclesCtr == 5){
+        detect();
+        turnSequence('l');
+    }
+    else if(bouclesCtr == 6){
+        del.rouge();
+        detect();
+        sharpTurnLeft();
+    }
+    else if(bouclesCtr == 7){
+        detect();
+        turnSequence('l');
+        del.rouge();
+    }
+    else if(bouclesCtr == 8){
+        detect();
+        turnSequence('l');
+    }
+    else if(bouclesCtr == 9){
+        detect();
+        turnSequence('l');
+    }
+    else if(bouclesCtr == 10){
+        detect();
+        turnSequence('l');
+    }
 }
 //////////////////////////////z////////////////////////////////////////////////
 //Fonctions pour faire fonctionner le LCD Display.
