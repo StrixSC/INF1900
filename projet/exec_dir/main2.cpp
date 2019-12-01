@@ -133,7 +133,23 @@ int main(){
     // robot.moteur.stopEngine();
     // robot.initEndSequence();
 
+    // robot.detect();
+    // robot.coupure();
+    // robot.detect();
+    // robot.avancerCoupureACouloir();
+    // robot.detect();
+    // robot.avancerJusquaCouloir();
+    // robot.detect();
+    // robot.couloir();
+    // robot.detect();
+    // robot.avancerCouloirAMur();
+    // robot.detect();
+    // robot.mur();
+    // robot.detect();
+    // robot.avancerMurABoucle();
     robot.detect();
-    robot.coupure();
+    robot.boucles();
+    // robot.avancerBoucleACoupure();
     robot.stop();
+    
 }

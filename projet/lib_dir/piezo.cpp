@@ -15,7 +15,6 @@ void Piezo::init(){
 }
 
 void Piezo::stop(){
-    DDRB = 0x00;
     OCR0A = 0; //On set la duree 0 ;
     TCNT0 = 0; //On set le timer a 0;
     TCCR0B = 0; //On arrete le timer;

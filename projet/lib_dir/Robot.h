@@ -48,13 +48,15 @@ class Robot {
         //Methodes necessaire pour les sections du parcours
         void initEndSequence();
         void followLine();
+        void basicFollowLine();
         void turnSequence(const char direction);
         void sonarSendPulse();
         void sonarReadOutput();
         void sonarDetect();
         void stop();
         char boucles_ctr_char_converter(const uint8_t num);
-        void bouclesFL();
+        void boucleFL();
+        void boucleCheck();
         void basicTurnSequence(const char direction);
 
         //Le parcours
@@ -63,7 +65,9 @@ class Robot {
         void avancerCouloirAMur();
         void mur();
         void avancerMurABoucles();
+        void hardCodeBoucles();
         void boucles();
+        void boucleGotoNextCorner(uint8_t& counter);
         void avancerBouclesACoupure();
         void avancerJusquaProchaineCoupure();
         void coupure();

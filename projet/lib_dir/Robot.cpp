@@ -78,22 +78,17 @@ void Robot::followLine(){
     }
 }
 
-void Robot::bouclesFL(){
+void Robot::basicFollowLine(){
     detect();
-    if(C3 || (C2 && C3 && C4)){         
+
+    if(C3 || (C2 && C3 && C4)){
         moteur.changeSpeed(AVGSPEED, AVGSPEED);
     }
-    else if(C2 || (C1 && C2)){              
-        moteur.changeSpeed(SUBSPEED, AVGSPEED);
-    }
-    else if(C4 || (C4 && C5)){              
-        moteur.changeSpeed(AVGSPEED, SUBSPEED);
-    }
-    else if(C1){                            
+    else if(C1 || (C1 && C2)){
         moteur.changeSpeed(NOSPEED, AVGSPEED);
     }
-    else if(C5){                            
-        moteur.changeSpeed(AVGSPEED, NOSPEED);  
+    else if(C4 || (C4 && C5)){
+        moteur.changeSpeed(AVGSPEED, NOSPEED);
     }
 }
 
@@ -108,11 +103,15 @@ void Robot::turnSequence(const char direction){
         while(turnBool){
             detect();
             if(C3 || C4){
-                turnBool = false;
+                _delay_ms(100);
+                detect();
+                if(C3 || C4){
+                    turnBool = false;
+                }
             }
             else{
                 del.rouge();
-                moteur.turnRight(HIGHSPEED);
+                moteur.turnRight(SUBSPEED);
                 detect();
             }
         }
@@ -123,11 +122,15 @@ void Robot::turnSequence(const char direction){
         while(turnBool){
             detect();
             if(C2 || C3){
-                turnBool = false;
+                _delay_ms(100);
+                detect();
+                if(C2 || C3){
+                    turnBool = false;
+                }
             }
             else{
                 del.vert();
-                moteur.turnLeft(HIGHSPEED);
+                moteur.turnLeft(SUBSPEED);
                 detect();
             }
         }
@@ -141,6 +144,7 @@ void Robot::basicTurnSequence(const char direction){
     if(direction == 'r'){
         bool turnRight = true;
         while(turnRight){
+            detect();
             if(C3 || C4 || C5){
                 _delay_ms(DEBOUNCE_DELAY);
                 detect();
@@ -156,6 +160,7 @@ void Robot::basicTurnSequence(const char direction){
     else if(direction == 'l'){
         bool turnLeft = true;
         while(turnLeft){
+            detect();
             if(C1 || C2 || C3){
                 _delay_ms(DEBOUNCE_DELAY);
                 detect();
@@ -258,7 +263,7 @@ void Robot::couloir(){
             followLine();
         }
     }
-    moteur.changeSpeed(HIGHSPEED, NOSPEED);
+    moteur.changeSpeed(AVGSPEED, NOSPEED);
     while(couloir){
         detect();
         
@@ -285,7 +290,7 @@ void Robot::couloir(){
             if(C1 || (C1 && C2)){
                 couloirLeanLeft = false;
             }
-            moteur.changeSpeed(NOSPEED, HIGHSPEED);
+            moteur.changeSpeed(NOSPEED, AVGSPEED);
             counter++;
         }
         while(couloirLeanRight){
@@ -293,7 +298,7 @@ void Robot::couloir(){
             if(C5 || (C4 && C5)){
                 couloirLeanRight = false;
             }
-            moteur.changeSpeed(HIGHSPEED, NOSPEED);
+            moteur.changeSpeed(AVGSPEED, NOSPEED);
             counter++;
         }
     }
@@ -359,40 +364,135 @@ void Robot::mur(){
 }
 
 
-void Robot::avancerMurABoucles(){}
-
-void Robot::boucles(){
-    uint8_t bclCounter = 0; 
-    bool bcl = true;
-    while(bcl){
-        uart.transmissionUART(bclCounter);
+void Robot::avancerMurABoucles(){
+    bool murAboucle = true;
+    while(murAboucle){
         detect();
-        if(C1 && C2 && C3 || (C1 && C2 && C3 && C4)){
-            _delay_ms(100);
+        if(!C1 && !C2 && !C3 && !C4 && !C5){
+            _delay_ms(DEBOUNCE_DELAY);
             detect();
-            if(C1 && C2 && C3  || (C1 && C2 && C3 && C4) ){
-                moteur.changeSpeed(AVGSPEED, AVGSPEED);
-                _delay_ms(DEBOUNCE_DELAY);
-                bclCounter++;
+            if(!C1 && !C2 && !C3 && !C4 && !C5){
+                turnSequence('l');
+                murAboucle = false;
             }
         }
-        else if(C3 || (C2 && C3 && C5)){
-            moteur.changeSpeed(AVGSPEED, AVGSPEED);
+        else{
+            basicFollowLine();
         }
-        else if(C2){
-            moteur.changeSpeed(AVGSPEED, HIGHSPEED);
-        }
-        else if(C4){
-            moteur.changeSpeed(HIGHSPEED, AVGSPEED);
-        }
-        else if(C5 || C4 && C5){
-            moteur.changeSpeed(AVGSPEED, NOSPEED);
-        }
-        else if(C1 || C2 && C1){
-            moteur.changeSpeed(NOSPEED, AVGSPEED);
-        }
+    }
+}
 
-        switch(bclCounter){
+void Robot::boucleFL(){
+    detect();
+    if(C2 && C3){
+        moteur.changeSpeed(SUBSPEED, AVGSPEED);
+    }
+    else if (C4 && C3){
+        moteur.changeSpeed(AVGSPEED, SUBSPEED);
+    }
+    else if(C3 || (C2 && C3 && C4)){
+        moteur.changeSpeed(SUBSPEED, SUBSPEED);
+    }
+    else if(C1 || (C2 && C1)){
+        moteur.changeSpeed(NOSPEED, SUBSPEED);
+    }
+    else if(C4 || (C5 && C4)){
+        moteur.changeSpeed(SUBSPEED, NOSPEED);
+    }
+}
+
+void Robot::boucleCheck(){
+    bool bcl = true;
+    while(bcl){
+        if((C1 && C2 && C3 )|| (C1 && C2 && C3 && C4) || (!C1 && !C2 && !C3 && !C4 && !C5) || (C1 && C2 && C3 && C4 && C5)){
+            _delay_ms(DEBOUNCE_DELAY);
+            detect();
+            if((C1 && C2 && C3 ) || (C1 && C2 && C3 && C4) || (!C1 && !C2 && !C3 && !C4 && !C5) || (C1 && C2 && C3 && C4 && C5)){
+                bcl = false;
+            }
+        }
+        else {
+            boucleFL();
+        }
+    }
+}
+void Robot::hardCodeBoucles(){
+    uint8_t bclCounter = 0; 
+    bool bcl = true;
+    boucleCheck();  //0 -> 1
+    detect();
+    del.vert();
+    boucleCheck();  //1 -> 2
+    detect();
+    del.rouge();
+    boucleCheck();  //2 -> 3
+    detect();
+    del.eteindre();
+    turnSequence('l'); //A 3 on turn left
+    detect();
+    del.vert();
+    boucleCheck();      //3 -> 4
+    detect();
+    turnSequence('l'); //A 4 on turn left
+    del.rouge();
+    detect();
+    boucleCheck();     //4-> 5
+    detect();
+    turnSequence('l'); //A 4 on turn left
+    del.vert();
+    detect();
+    boucleCheck();     //5-> 6
+    detect();
+    del.rouge();
+    turnSequence('l'); //A 5 on turn left
+    detect();
+    boucleCheck();     //6->7
+    del.vert();
+    detect();
+    turnSequence('l'); //A 7 on turn left
+    detect();
+    boucleCheck();     //7-> 8
+    del.rouge();
+    detect();
+    turnSequence('l'); //A 8 on turn left
+    del.vert();
+    detect();
+    boucleCheck();     //8->9
+    del.rouge();
+    detect();
+    turnSequence('l'); //A 9 on turn left;
+    detect();
+    boucleCheck();     //9->10;
+    del.vert();
+    detect();
+    turnSequence('l'); //A 10 on turn left;
+}
+
+void Robot::boucleGotoNextCorner(uint8_t& counter){
+    bool detected = true;
+    while(detected){
+        detect();
+        if((C1 && C2 && C3) || (!C1 && !C2 && !C3 && !C4 && !C5) || (C1 && C2 && C3 && C4)){
+            _delay_ms(DEBOUNCE_DELAY);
+            detect();
+            if((C1 && C2 && C3) || (!C1 && !C2 && !C3 && !C4 && !C5) || (C1 && C2 && C3 && C4)){
+                detected = false;
+                counter+=1;
+            }
+        }
+        else{
+            boucleFL();
+        }
+    }
+}
+
+void Robot::boucles(){
+    uint8_t boucleCounter = 0;
+    while(boucleCounter <= 12){
+        detect();
+        boucleGotoNextCorner(boucleCounter);
+
+        switch(boucleCounter){
             case 0: break;
             case 1: break;
             case 2: break;
@@ -405,13 +505,28 @@ void Robot::boucles(){
             case 9: turnSequence('l'); break;
             case 10: turnSequence('l'); break;
             case 11: break;
-            case 12: bcl = false; break;
+            case 12: break;
         }
     }
-    del.vert();
 }
 
-void Robot::avancerBouclesACoupure(){}
+void Robot::avancerBouclesACoupure(){
+    bool boucleACoupure = true;
+    while(boucleACoupure){
+        detect();
+        if(!C1 && !C2 && !C3 && !C4 && !C5){
+            _delay_ms(DEBOUNCE_DELAY);
+            detect();
+            if(!C1 && !C2 && !C3 && !C4 && !C5){
+                turnSequence('l');
+                boucleACoupure = false;
+            }
+        }
+        else{
+            basicFollowLine();
+        }
+    }
+}
 
 void Robot::avancerJusquaProchaineCoupure(){
     bool coupureBool = true;
@@ -425,26 +540,41 @@ void Robot::avancerJusquaProchaineCoupure(){
             }
         }
         else{
-            if(C3 || (C2 && C3 && C4)){
-                moteur.changeSpeed(AVGSPEED, AVGSPEED);
-            }
-            else if(C1 || C2 || (C1 && C2)){
-                moteur.changeSpeed(NOSPEED, AVGSPEED);
-            }
-            else if(C4 || C5 || (C4 && C5)){
-                moteur.changeSpeed(AVGSPEED, NOSPEED);
-            }
+            basicFollowLine();
         }
     }
 }
 void Robot::coupure(){
     avancerJusquaProchaineCoupure();
+    piezo.play(80); //Son aigue
     basicTurnSequence('r');
+    piezo.stop();
     avancerJusquaProchaineCoupure();
+    piezo.play(50); //Son grave
     basicTurnSequence('l');
+    piezo.stop();
     avancerJusquaProchaineCoupure();
+    piezo.play(80); //Son aigue
     basicTurnSequence('r');
+    piezo.stop();
     avancerJusquaProchaineCoupure();
+    piezo.play(50); //Son grave
     basicTurnSequence('l');
+    piezo.stop();
 }
-void Robot::avancerCoupureACouloir(){}
+void Robot::avancerCoupureACouloir(){
+    bool coupureACouloir = true;
+    while(coupureACouloir){
+        detect();
+        if(!C1 && !C2 && !C3 && !C4 && !C5){
+            _delay_ms(DEBOUNCE_DELAY);
+            detect();
+            if(!C1 && !C2 && !C3 && !C4 && !C5){
+                coupureACouloir = false;
+            }
+        }
+        else{
+           basicFollowLine();
+        }
+    }
+}
