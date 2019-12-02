@@ -1,18 +1,23 @@
 /**************************************************************************************************************************
 Auteurs: Nawras Mohammed Amin, John Maliha, Johnny Khoury, Fadi Nourredine
-Description: Ce fichier permet de faire passer au robot différents états pour lui faire faire ce que nous désirons en fonction de ce qu'il lui est passé en paramètres
-            grâce aux états du switch case.
-Fichiers utilisés: Uart.h, includes.h, memoire_24.h, del.h, enums.h, moteur.h
-
 **************************************************************************************************************************/
 #include "Robot.h"
+
+#define END 0
+#define COULOIR 1
+#define MUR 2
+#define BOUCLES 3 
+#define COUPURES 4
 
 #define DEMO_DDR DDRC // `Data Direction Register' AVR occup� par l'aff.
 #define DEMO_PORT PORTC // Port AVR occup� par l'afficheur
 Robot robot;
-enum CurrentSection {Couloir, Mur, Boucles, Coupures};
-CurrentSection current; 
-LCM disp(&DEMO_DDR, &DEMO_PORT);\
+LCM disp(&DEMO_DDR, &DEMO_PORT);
+uint8_t currentSection = 0;
+uint8_t initSection = 0;
+uint16_t clickCounter = 0;
+bool lcd = true;
+volatile bool init = false;
 void static inline w(void) {
 	cp_wait_ms(2000);
 }
@@ -25,36 +30,107 @@ void initialisation(void) {
   sei ();
 }
 
+ISR(INT1_vect){
+    _delay_ms(30);
+    if(!(PIND & (1 << PD3))){
+        init = true;
+    }
+    else{
+        init = false;
+    }
+    EIFR |= (1 << INTF1);
+}
+
 ISR(INT0_vect){
     _delay_ms(30);
     if(PIND & 0x04){
-        _delay_ms(50);
+        _delay_ms(30);
         if(PIND & 0x04){
+            robot.del.vert();
             robot.btn.setClicked(1);
         }
     }
     else{
         robot.btn.setClicked(0);
+        robot.del.eteindre();
     }
 }
 
-ISR(INT1_vect){
-    _delay_ms(30);
-    if(!(PIND & (1 << PD3))){
-        robot.whiteBtnClick = true;
+
+void setInitSection(const uint8_t section){
+    switch(section)
+    {
+    case COULOIR: 
+            initSection = 1;
+        break;
+    case MUR: // affiche « le mur »
+            initSection = 2;
+        break;
+    case BOUCLES: // affiche « les deux boucles »
+            initSection = 3;
+        break;
+    case COUPURES: // affiche « les coupures »
+            initSection = 4;
+        break;
+    case END: // affiche « fin »
+            initSection = 0;
+        break;
     }
-    else {
-        robot.whiteBtnClick = false;
-    }
-    EIFR |= (1 << INTF1);
 }
 
-const char* section_char_convert(CurrentSection& current){
-    switch(current){
-        case Couloir: return "Couloir";
-        case Mur: return "Mur";
-        case Boucles: return "Boucles";
-        case Coupures: return "Coupures";
+void showCurrentSection(const uint8_t section){
+    switch (section)
+    {
+        case END: 
+            disp = "SHUTDOWN";
+            break;
+        case COULOIR: 
+            disp = "Le Couloir";
+            break;
+        case MUR: 
+            disp = "Le Mur";
+            break;
+        case BOUCLES: 
+            disp = "Les Deux Boucles";
+            break;
+        case COUPURES:
+            disp = "Les Coupures";
+            break;
+    }
+}
+
+void sectionTransition(){
+    switch(currentSection){
+        case END: //
+        break;
+        
+        case BOUCLES:
+            if(initSection != COUPURES)
+                currentSection = COUPURES;
+            else 
+                currentSection = END;
+        break;
+
+        case COUPURES:
+            if(initSection != COULOIR)
+                currentSection = COULOIR; 
+            else
+                currentSection = END;
+        break;
+
+        case COULOIR:
+            if(initSection != MUR)
+                currentSection = MUR; 
+            else
+                currentSection = END;
+        break;
+
+        case MUR:
+            if(initSection != BOUCLES)
+                currentSection = BOUCLES; 
+            else
+                currentSection = END;
+        break;
     }
 }
 
@@ -64,92 +140,85 @@ const char* section_char_convert(CurrentSection& current){
 ///////////                                 ///////////
 ///////////////////////////////////////////////////////
 int main(){
-
     initialisation();
-    // bool beginTrack = true;
-    // bool init = false;
-    // uint8_t sectionSelect = 0;
+    bool init = false;
+    while (!init)
+    {   
+        robot.stop();
+        if(robot.btn.getClicked()){
+            lcd = true;
+            clickCounter++;
+        }
+        else{
+            lcd = false;
+        }
+        if(lcd)
+        {    
+            switch (clickCounter % 4)  //Modulo quatre pour ne pas avoir a reset le counter si on click plus que 4 fois.
+            {
+                case COULOIR:
+                    setInitSection(COULOIR);
+                break;
+                case MUR:
+                    setInitSection(MUR);
+                break;
+                case BOUCLES:
+                    setInitSection(BOUCLES);
+                break;
+                case COUPURES:
+                    setInitSection(COUPURES);
+                break;
+            }
+            showCurrentSection(initSection);
+            lcd = false;
+        }
+    }
 
-    // while(!init){
-    //     if(robot.btn.getClicked()){
-    //         init = true;
-    //     }
-        
-    //     if(robot.whiteBtnClick){
-    //         if(sectionSelect >= 4){
-    //             sectionSelect = 0;
-    //         }
-    //         sectionSelect++;
-    //     }
-    // }
+    while(currentSection != END){
+        switch(currentSection){
+            case COUPURES:
+                showCurrentSection(currentSection);
+                robot.detect();
+                robot.coupure();
+                robot.detect();
+                robot.avancerCoupureACouloir();
+                sectionTransition();
+            break;
 
-    // switch(sectionSelect){
-    //     case 1: current = Couloir; disp = section_char_convert(current); break;
-    //     case 2: current = Mur; disp = section_char_convert(current); break;
-    //     case 3: current = Boucles; disp = section_char_convert(current); break;
-    //     case 4: current = Coupures; disp = section_char_convert(current); break;
-    // }
+            case COULOIR:
+                showCurrentSection(currentSection);
+                robot.detect();
+                robot.avancerJusquaCouloir();
+                robot.detect();
+                robot.couloir();
+                robot.detect();
+                robot.avancerCouloirAMur();
+                sectionTransition();
+            break;
 
-    // initSection = current;
+            case MUR:
+                showCurrentSection(currentSection);
+                robot.detect();
+                robot.mur();
+                robot.detect();
+                robot.avancerMurABoucles();
+                sectionTransition();
+            break;
 
-    // switch(current){
-    //     case Couloir:
-    //         // robot.detect();
-    //         // robot.couloir();
-    //         // robot.detect();
-    //         // robot.avancerCouloirAMur();
-    //         robot.del.vert();
-    //         _delay_ms(1000);
-    //         robot.del.rouge();
-    //         while(true){};
+            case BOUCLES:
+                showCurrentSection(currentSection);
+                robot.detect();
+                robot.boucles();
+                robot.detect();
+                robot.avancerBouclesACoupure();     
+                sectionTransition();
+            break;
 
-    //     case Mur:
-    //         // robot.detect();
-    //         // robot.mur();
-    //         // robot.detect();
-    //         // robot.avancerMurABoucles();
-    //         robot.del.ambre();
-    //         while(true){};
-
-    //     case Boucles:
-    //         // robot.detect();
-    //         // robot.boucles();
-    //         // robot.detect();
-    //         // robot.avancerBouclesACoupure();
-    //         robot.del.rouge();
-    //         while(true){};
-        
-    //     case Coupures:
-    //         // robot.detect();
-    //         // robot.coupure();
-    //         // robot.detect();
-    //         // robot.avancerJusquaCouloir();
-    //         // current = Couloir;
-    //         robot.del.vert();
-    //         while(true){};
-    // }
-
-    // robot.stop();
-    // robot.moteur.stopEngine();
-    // robot.initEndSequence();
-
-    // robot.detect();
-    // robot.coupure();
-    // robot.detect();
-    // robot.avancerCoupureACouloir();
-    // robot.detect();
-    // robot.avancerJusquaCouloir();
-    // robot.detect();
-    // robot.couloir();
-    // robot.detect();
-    // robot.avancerCouloirAMur();
-    // robot.detect();
-    // robot.mur();
-    // robot.detect();
-    // robot.avancerMurABoucle();
-    robot.detect();
-    robot.boucles();
-    // robot.avancerBoucleACoupure();
+            case END:
+            break;
+        }
+    }
+    showCurrentSection(currentSection);
     robot.stop();
-    
+    robot.initEndSequence();
 }

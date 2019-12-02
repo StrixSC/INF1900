@@ -54,10 +54,9 @@ class Robot {
         void sonarReadOutput();
         void sonarDetect();
         void stop();
-        char boucles_ctr_char_converter(const uint8_t num);
-        void boucleFL();
         void boucleCheck();
         void basicTurnSequence(const char direction);
+        void boucleTurnSequence(const char direction);
 
         //Le parcours
         void avancerJusquaCouloir();
@@ -65,9 +64,7 @@ class Robot {
         void avancerCouloirAMur();
         void mur();
         void avancerMurABoucles();
-        void hardCodeBoucles();
         void boucles();
-        void boucleGotoNextCorner(uint8_t& counter);
         void avancerBouclesACoupure();
         void avancerJusquaProchaineCoupure();
         void coupure();
