@@ -15,8 +15,8 @@ Robot robot;
 LCM disp(&DEMO_DDR, &DEMO_PORT);
 uint8_t currentSection = 0;
 uint8_t initSection = 0;
-uint16_t clickCounter = 0;
-bool lcd = true;
+volatile uint16_t clickCounter = 0;
+volatile bool lcd = true;
 volatile bool init = false;
 void static inline w(void) {
 	cp_wait_ms(2000);
@@ -30,30 +30,26 @@ void initialisation(void) {
   sei ();
 }
 
-ISR(INT1_vect){
+ISR(INT0_vect){
     _delay_ms(30);
-    if(!(PIND & (1 << PD3))){
+    if(PIND & 0x04){
         init = true;
     }
     else{
         init = false;
     }
-    EIFR |= (1 << INTF1);
 }
 
-ISR(INT0_vect){
+ISR(INT1_vect){
     _delay_ms(30);
-    if(PIND & 0x04){
-        _delay_ms(30);
-        if(PIND & 0x04){
-            robot.del.vert();
-            robot.btn.setClicked(1);
-        }
+    if(!(PIND & (1 << PD3))){
+        lcd = true;
+        clickCounter++;
     }
     else{
-        robot.btn.setClicked(0);
-        robot.del.eteindre();
+        init = false;
     }
+    EIFR |= (1 << INTF1);
 }
 
 
@@ -141,20 +137,12 @@ void sectionTransition(){
 ///////////////////////////////////////////////////////
 int main(){
     initialisation();
-    bool init = false;
     while (!init)
     {   
         robot.stop();
-        if(robot.btn.getClicked()){
-            lcd = true;
-            clickCounter++;
-        }
-        else{
-            lcd = false;
-        }
         if(lcd)
         {    
-            switch (clickCounter % 4)  //Modulo quatre pour ne pas avoir a reset le counter si on click plus que 4 fois.
+            switch (clickCounter % 5)  //Modulo quatre pour ne pas avoir a reset le counter si on click plus que 4 fois.
             {
                 case COULOIR:
                     setInitSection(COULOIR);
@@ -173,6 +161,8 @@ int main(){
             lcd = false;
         }
     }
+
+    currentSection = initSection;
 
     while(currentSection != END){
         switch(currentSection){
@@ -214,11 +204,11 @@ int main(){
                 sectionTransition();
             break;
 
-            case END:
+            case END:Q
             break;
         }
     }
-    showCurrentSection(currentSection);
+
     robot.stop();
     robot.initEndSequence();
 }
