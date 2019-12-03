@@ -3,8 +3,12 @@
 //////////////////////////////////////////////////////////////////////////////////
 Projet 1: Initiation aux systems embarques avec la conception d'un robot suiveur de ligne
 
+Robot Name: Strix
 Equipe: Nawras Mohammed Amin, John Maliha, Johnny Khoury, Fadi Nourreddine.
 Equipe 0809.
+
+Le repertoire test_dir ne fait pas partie du projet final et n'est que la pour effectuer les tests
+necessaire lors de la programmation.
 
 //////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////ABOUT////////////////////////////////////////
