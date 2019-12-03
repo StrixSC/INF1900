@@ -1,8 +1,8 @@
 # Nom de votre projet
 # (utilisez un seul mot, exemple: 'monprojet')
-PROJECTNAME=main2
+PROJECTNAME=main
 # Fichiers sources
-PRJSRC= main2.cpp
+PRJSRC= main.cpp
 
 ##### A VERIFIER #####
 # LIBRAIRIE= $(libRobot).a
