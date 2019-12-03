@@ -77,24 +77,28 @@ void Robot::followLine(){
         }
     }
 }
-
 void Robot::basicFollowLine(){
     detect();
-    if(C2 && C3){
-        moteur.changeSpeed(35, SUBSPEED);
+    if((C2 && C3) || (C2 && C1)){
+        moteur.changeSpeed(SUBSPEED, AVGSPEED);
     }
-    else if (C4 && C3){
-        moteur.changeSpeed(SUBSPEED, 35);
+    else if ((C4 && C3) || (C4 && C5)){
+        moteur.changeSpeed(AVGSPEED, SUBSPEED);
     }
     else if(C3 || (C2 && C3 && C4)){
         moteur.changeSpeed(AVGSPEED, AVGSPEED);
     }
-    else if(C1 || (C2 && C1)){
-        moteur.changeSpeed(NOSPEED, 35);
+    else if(C1){
+        moteur.changeSpeed(NOSPEED, SUBSPEED);
     }
-    else if(C4 || (C5 && C4)){
-        moteur.changeSpeed(35, NOSPEED);
+    else if(C5){
+        moteur.changeSpeed(AVGSPEED, NOSPEED);
     }
+}
+
+void Robot::boost(){
+    moteur.changeSpeed(HIGHSPEED, HIGHSPEED);
+    _delay_ms(50);
 }
 
 void Robot::stop(){
@@ -147,36 +151,38 @@ void Robot::turnSequence(const char direction){
 
 void Robot::basicTurnSequence(const char direction){
         if(direction == 'r'){
-        bool turnRight = true;
-        while(turnRight){
-            detect();
-            if(C3 || C4 || C5){
-                _delay_ms(75);
+            bool turnRight = true;
+            while(turnRight){
                 detect();
                 if(C3 || C4 || C5){
-                    turnRight = false;
+                    _delay_ms(40);
+                    detect();
+                    if(C3 || C4 || C5){
+                        turnRight = false;
+                    }
+                }
+                else {
+                    moteur.changeSpeed(45, NOSPEED);
                 }
             }
-            else {
-                moteur.changeSpeed(AVGSPEED, NOSPEED);
-            }
-        }
+            boost();
     }
     else if(direction == 'l'){
         bool turnLeft = true;
         while(turnLeft){
             detect();
             if(C1 || C2 || C3){
-                _delay_ms(75);
+                _delay_ms(60);
                 detect();
                 if(C1 || C2 || C3){
                     turnLeft = false;
                 }
             }
             else {
-                moteur.changeSpeed(NOSPEED, AVGSPEED);
+                moteur.changeSpeed(NOSPEED, 45);
             }
         }
+        boost();
     }
     else{   //Direction == NULL
         return;
@@ -199,6 +205,7 @@ void Robot::boucleTurnSequence(const char direction){
                 moteur.changeSpeed(AVGSPEED, NOSPEED);
             }
         }
+        boost();
     }
     else if(direction == 'l'){
         bool turnLeft = true;
@@ -215,6 +222,7 @@ void Robot::boucleTurnSequence(const char direction){
                 moteur.changeSpeed(NOSPEED, AVGSPEED);
             }
         }
+        boost();
     }
     else{   //Direction == NULL
         return;
@@ -278,16 +286,6 @@ void Robot::couloir(){
     uint32_t counter = 0;
     uint32_t previousCounter = 0;
     
-    bool tempFL = true;
-    while(tempFL){
-        detect();
-        if(!C1 && !C2 && !C3 && !C4 && !C5){
-            tempFL = false;
-        }
-        else{
-            followLine();
-        }
-    }
     moteur.changeSpeed(AVGSPEED, NOSPEED);
     while(couloir){
         detect();
@@ -329,6 +327,7 @@ void Robot::couloir(){
     }
 }
 
+
 void Robot::avancerCouloirAMur(){
     detect();
     bool detected = true;
@@ -338,8 +337,8 @@ void Robot::avancerCouloirAMur(){
             _delay_ms(DEBOUNCE_DELAY);
             detect();
             if(!C1 && !C2 && !C3 && !C4 && !C5){
-                moteur.changeSpeed(AVGSPEED, AVGSPEED);
-                _delay_ms(HALF_SECOND);
+                moteur.changeSpeed(45, 45);
+                _delay_ms(300);
                 turnSequence('l');
                 detected = false;
             }
@@ -348,49 +347,49 @@ void Robot::avancerCouloirAMur(){
             followLine();
         }
     }
+}
 
-    bool preMur = true;
-        while(preMur){
+void Robot::preMur(){
+    bool premur = true;
+    while(premur){
+        detect();
+        if(!C1 && !C2 && !C3 && !C4 && !C5){
+            _delay_ms(50);
             detect();
             if(!C1 && !C2 && !C3 && !C4 && !C5){
-                _delay_ms(DEBOUNCE_DELAY);
-                detect();
-                if(!C1 && !C2 && !C3 && !C4 && !C5){
-                    preMur = false;
-                }
-            }
-            else {
-                detect();
-                followLine();
+                premur = false;
             }
         }
+        else{
+            basicFollowLine();
+        }
     }
+}
 
 void Robot::mur(){
     bool mur = true;
     while(mur){
         detect();
         if(C1 || C2 || C3 || C4 || C5){
-            moteur.changeSpeed(AVGSPEED, NOSPEED);
-            mur = false;
-        }
-
+                basicTurnSequence('r');
+                _delay_ms(DEBOUNCE_DELAY);
+                mur = false;
+            }
         sonarSendPulse();
         sonarReadOutput();
         _delay_ms(50);
 
-        if(distance >=13  && distance <= 17){
+        if(distance >=14  && distance <= 19){
             moteur.changeSpeed(AVGSPEED, AVGSPEED);
         }
-        else if(distance < 13){
-            moteur.changeSpeed(SUBSPEED,0);
+        else if(distance < 14){
+            moteur.changeSpeed(AVGSPEED,NOSPEED);
         }
-        else if(distance > 17){
-            moteur.changeSpeed(0, SUBSPEED);
+        else if(distance > 19){
+            moteur.changeSpeed(NOSPEED, AVGSPEED);
         }
     }
 }
-
 
 void Robot::avancerMurABoucles(){
     bool murAboucle = true;
@@ -401,8 +400,8 @@ void Robot::avancerMurABoucles(){
             detect();
             if(!C1 && !C2 && !C3 && !C4 && !C5){
                 moteur.changeSpeed(AVGSPEED, AVGSPEED);
-                _delay_ms(HALF_SECOND);
-                turnSequence('l');
+                _delay_ms(DEBOUNCE_DELAY);
+                basicTurnSequence('l');
                 murAboucle = false;
             }
         }
@@ -410,13 +409,15 @@ void Robot::avancerMurABoucles(){
             basicFollowLine();
         }
     }
+    boost();
 }
 
 void Robot::boucleCheck(){
     bool bcl = true;
     while(bcl){
+        detect();
         if((C1 && C2 && C3 )|| (C1 && C2 && C3 && C4) || (!C1 && !C2 && !C3 && !C4 && !C5) || (C1 && C2 && C3 && C4 && C5)){
-            _delay_ms(125);
+            _delay_ms(110);
             detect();
             if((C1 && C2 && C3 ) || (C1 && C2 && C3 && C4) || (!C1 && !C2 && !C3 && !C4 && !C5) || (C1 && C2 && C3 && C4 && C5)){
                 bcl = false;
@@ -428,8 +429,12 @@ void Robot::boucleCheck(){
     }
 }
 void Robot::boucles(){
+    moteur.changeSpeed(AVGSPEED, SUBSPEED);
+    _delay_ms(50);
     uint16_t counter = 0;
+    del.vert();
     while(counter <= 12){
+        detect();
         boucleCheck();
         counter++;
         switch(counter){
@@ -444,30 +449,32 @@ void Robot::boucles(){
             break;
             case 3: 
                 del.rouge();
+                moteur.changeSpeed(NOSPEED, AVGSPEED);
+                _delay_ms(100);
                 boucleTurnSequence('l'); 
             break;
             case 4: 
                 del.vert();
                 moteur.changeSpeed(SUBSPEED, SUBSPEED);
-                _delay_ms(HALF_SECOND);
+                _delay_ms(100);
                 moteur.changeSpeed(NOSPEED, AVGSPEED);
-                _delay_ms(DEBOUNCE_DELAY);
+                _delay_ms(100);
                 boucleTurnSequence('l'); 
             break;
             case 5: 
                 del.rouge();
                 moteur.changeSpeed(SUBSPEED, SUBSPEED);
-                _delay_ms(HALF_SECOND);
+                _delay_ms(100);
                 moteur.changeSpeed(NOSPEED, AVGSPEED);
-                _delay_ms(DEBOUNCE_DELAY);
+                _delay_ms(100);
                 boucleTurnSequence('l'); 
             break;
             case 6: 
                 del.vert();
                 moteur.changeSpeed(SUBSPEED, SUBSPEED);
-                _delay_ms(HALF_SECOND);
+                _delay_ms(100);
                 moteur.changeSpeed(NOSPEED, AVGSPEED);
-                _delay_ms(DEBOUNCE_DELAY);
+                _delay_ms(100);
                 boucleTurnSequence('l'); 
             break;
             case 7: 
@@ -481,17 +488,17 @@ void Robot::boucles(){
             case 9: 
                 del.rouge();
                 moteur.changeSpeed(SUBSPEED, SUBSPEED);
-                _delay_ms(HALF_SECOND);
+                _delay_ms(100);
                 moteur.changeSpeed(NOSPEED, AVGSPEED);
-                _delay_ms(DEBOUNCE_DELAY);
+                _delay_ms(100);
                 boucleTurnSequence('l'); 
             break;
             case 10: 
                 del.vert();
                 moteur.changeSpeed(SUBSPEED, SUBSPEED);
-                _delay_ms(HALF_SECOND);
+                _delay_ms(100);
                 moteur.changeSpeed(NOSPEED, AVGSPEED);
-                _delay_ms(DEBOUNCE_DELAY);
+                _delay_ms(100);
                 boucleTurnSequence('l'); 
             break;
             case 11: break;
@@ -553,6 +560,7 @@ void Robot::coupure(){
     basicTurnSequence('l');
     piezo.stop();
 }
+
 void Robot::avancerCoupureACouloir(){
     bool coupureACouloir = true;
     while(coupureACouloir){
@@ -562,7 +570,7 @@ void Robot::avancerCoupureACouloir(){
             detect();
             if(!C1 && !C2 && !C3 && !C4 && !C5){
                 moteur.changeSpeed(AVGSPEED, AVGSPEED);
-                _delay_ms(HALF_SECOND);
+                _delay_ms(DEBOUNCE_DELAY);
                 coupureACouloir = false;
             }
         }

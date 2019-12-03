@@ -137,9 +137,9 @@ void sectionTransition(){
 ///////////////////////////////////////////////////////
 int main(){
     initialisation();
+    robot.stop();
     while (!init)
     {   
-        robot.stop();
         if(lcd)
         {    
             switch (clickCounter % 5)  //Modulo quatre pour ne pas avoir a reset le counter si on click plus que 4 fois.
@@ -163,52 +163,63 @@ int main(){
     }
 
     currentSection = initSection;
-
     while(currentSection != END){
         switch(currentSection){
             case COUPURES:
                 showCurrentSection(currentSection);
+                robot.boost();
                 robot.detect();
                 robot.coupure();
                 robot.detect();
                 robot.avancerCoupureACouloir();
+                robot.boost();
                 sectionTransition();
             break;
 
             case COULOIR:
                 showCurrentSection(currentSection);
+                robot.boost();
                 robot.detect();
                 robot.avancerJusquaCouloir();
                 robot.detect();
                 robot.couloir();
                 robot.detect();
                 robot.avancerCouloirAMur();
+                robot.boost();
                 sectionTransition();
             break;
 
             case MUR:
                 showCurrentSection(currentSection);
+                robot.boost();
+                robot.detect();
+                robot.preMur();
                 robot.detect();
                 robot.mur();
                 robot.detect();
                 robot.avancerMurABoucles();
+                robot.boost();
                 sectionTransition();
             break;
 
             case BOUCLES:
                 showCurrentSection(currentSection);
+                robot.boost();
                 robot.detect();
                 robot.boucles();
                 robot.detect();
-                robot.avancerBouclesACoupure();     
+                robot.avancerBouclesACoupure();  
+                robot.boost();   
                 sectionTransition();
             break;
 
-            case END:Q
+            case END:
             break;
         }
     }
-
+    
+    robot.detect();
     robot.stop();
     robot.initEndSequence();
+    
 }

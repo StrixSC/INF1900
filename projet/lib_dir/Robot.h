@@ -23,8 +23,8 @@
 #define CAPTEUR5 0b00010000
 
 #define NOSPEED 0
-#define LOWSPEED 30
-#define SUBSPEED 40
+#define LOWSPEED 35
+#define SUBSPEED 45
 #define AVGSPEED 50
 #define HIGHSPEED 60
 #define ULTRASPEED 70
@@ -62,6 +62,7 @@ class Robot {
         void avancerJusquaCouloir();
         void couloir();
         void avancerCouloirAMur();
+        void preMur();
         void mur();
         void avancerMurABoucles();
         void boucles();
@@ -69,6 +70,7 @@ class Robot {
         void avancerJusquaProchaineCoupure();
         void coupure();
         void avancerCoupureACouloir();
+        void boost();
 
 
         Bouton btn; 
