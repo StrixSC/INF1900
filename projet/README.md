@@ -1,5 +1,9 @@
 # INF 1900/
 
+### The following readme is entirely in French and this is the only part of it that is in English. This project was due for our embedded systems class INF1900. The following contains the specs regarding the material we had to use and the procedure we took in order to complete the given task: Making a linetracker robot for a given trajectory.
+
+### Thank you for using https://www.deepl.com/translator to translate anything that is not understandable :)
+
 Projet 1: Initiation aux systems embarques avec la conception d'un robot suiveur de ligne
 
 Robot Name: Strix
