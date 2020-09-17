@@ -1,8 +1,6 @@
-# INF 1900/
+# INF 1900
 
-### The following readme is entirely in French and this is the only part of it that is in English. This project was due for our embedded systems class INF1900. The following contains the specs regarding the material we had to use and the procedure we took in order to complete the given task: Making a linetracker robot for a given trajectory.
-
-### Thank you for using https://www.deepl.com/translator to translate anything that is not understandable :)
+### The following readme is entirely in French and this is the only part of it that is in English. This project was due for our embedded systems class INF1900. The following contains the specs of the material we had to use and the procedure we took in order to complete the given task: Making a linetracker robot for a given trajectory.
 
 Projet 1: Initiation aux systems embarques avec la conception d'un robot suiveur de ligne
 
@@ -15,7 +13,7 @@ necessaire lors de la programmation.
 
 
 
-# ABOUT/
+# ABOUT
 
 Le premier projet d'integration du parcours conciste a la conception du code d'un robot suiveur de 
 ligne. Le robot doit pouvoir passer a travers une serie de section dans un trajet donne. Le robot doit utiliser
@@ -23,7 +21,7 @@ des algorithmes jumeles avec les APIs des materiaux utilises pour la conception 
 
 
 
-# ROBOT/
+# ROBOT
 
 Avant tout parlons du robot:
 
@@ -64,7 +62,7 @@ Nous avions aussi ete fournie le code complet du LCD Display.
 
 
 
-# PROGRAMMATION/
+# PROGRAMMATION
 
 Le robot devait etre programmer en utilisant la librairie que nous devions faire nous meme, ainsi qu'un Makefile, car nous programmions sur Linux.
 
@@ -107,7 +105,7 @@ avec les executables. Le makefile commun etait fait pour eviter les doublons de 
 
 
 
-# LIB/
+# LIB
 
 La librairie a ete faite par nous et contient les classes necessaire pour utiliser les composantes du robot
 
