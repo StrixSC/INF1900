@@ -13,7 +13,7 @@ necessaire lors de la programmation.
 
 
 
-# ABOUT
+### ABOUT
 
 Le premier projet d'integration du parcours conciste a la conception du code d'un robot suiveur de 
 ligne. Le robot doit pouvoir passer a travers une serie de section dans un trajet donne. Le robot doit utiliser
@@ -21,7 +21,7 @@ des algorithmes jumeles avec les APIs des materiaux utilises pour la conception 
 
 
 
-# ROBOT
+### ROBOT
 
 Avant tout parlons du robot:
 
@@ -62,7 +62,7 @@ Nous avions aussi ete fournie le code complet du LCD Display.
 
 
 
-# PROGRAMMATION
+### PROGRAMMATION
 
 Le robot devait etre programmer en utilisant la librairie que nous devions faire nous meme, ainsi qu'un Makefile, car nous programmions sur Linux.
 
@@ -105,7 +105,7 @@ avec les executables. Le makefile commun etait fait pour eviter les doublons de 
 
 
 
-# LIB
+### LIB
 
 La librairie a ete faite par nous et contient les classes necessaire pour utiliser les composantes du robot
 
@@ -159,7 +159,7 @@ Permet d'obtenir l'information sur le stade du bouton poussoir interrupt
 
 
 
-# PORTS : 
+### PORTS : 
 - ## DDRA: 
     - 6 4 2 0
     - ####  1 0 0 0     
