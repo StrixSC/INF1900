@@ -1,4 +1,4 @@
-## Rover Robot
+## RR
 (name extremely likely to change due to pivot)
 
 The previous README was removed because I\'m in the process of pivoting this project to something else.
